@@ -41,7 +41,7 @@ const App = () => {
   const [address, setAddress] = useState("");
   const [popup, setPopup] = useState(false);
   const [bugBalance, setBugBalance] = useState("0");
-
+  const [start,setStart] = useState(false);
   // useEffect(() => {
   //   bugsContract(w0, addNetwork, bugsABI);
   // }, []);
@@ -70,11 +70,13 @@ const App = () => {
       rand();
       setTimeout(() => {
         setPopup(true);
+        checkAllowance()
+        getBugBalance()
       }, 1000);
       setValue(-1);
+      setStart(false)
     }
-    checkAllowance()
-    getBugBalance()
+  
   }, [value]);
 
   useEffect(() => {
@@ -123,6 +125,7 @@ const App = () => {
       setBugBalance(bigNumber.toString());
     } catch (error) {
       console.log(error);
+      setStart(false)
       toast("Error Occured!");
       // setSpin(false);
     }
@@ -161,6 +164,7 @@ const App = () => {
       setAllowed(bigNumber.toString());
     } catch (error) {
       console.log(error);
+      setStart(false)
       toast("Error Occured!");
       // setSpin(false);
     }
@@ -176,7 +180,7 @@ const App = () => {
   const getRandomNumber = async () => {
     if (address !== "") {
       const { data } = await axios.get(
-        `https://cpjj21vh-8080.inc1.devtunnels.ms/api/getrandomnumber/${address}`
+        `https://bugs-machine-backend.vercel.app/api/getrandomnumber/${address}`
       );
       console.log({ data });
     } else console.log(address);
@@ -213,6 +217,7 @@ const App = () => {
           );
           if (count === 1) {
             setValue(bugsAmountWonByUser.toString());
+            setStart(false)
             setwonPrize(bugsAmountWonByUser.toString());
           }
           console.log("Event:", event);
@@ -220,6 +225,7 @@ const App = () => {
       );
     } catch (error) {
       console.log(error);
+      setStart(false);
       toast("Error Occured!");
       setSpin(false);
     }
@@ -227,12 +233,10 @@ const App = () => {
 
   // console.log(value);
   const play = async () => {
+    setStart(true);
     console.log("playing");
     getRandomNumber();
     spinSlotMachine();
-    // setTimeout(() => {
-    //   setValue(7000);
-    // }, 100);
     if (ring3 > 1 || !spin) {
       if (input <= balance && input >= 1) {
         setRealBet(input);
@@ -284,6 +288,7 @@ const App = () => {
             authenticated={authenticated}
             betAmmount={betAmmount}
             setBetAmmount={setBetAmmount}
+            start={start}
           />
         </div>
       </div>

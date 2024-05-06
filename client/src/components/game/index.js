@@ -1,11 +1,10 @@
-import React from "react";
+import React, { useEffect } from "react";
 import Row1 from "../reels/row1";
 import Row2 from "../reels/row2";
 import Row3 from "../reels/row3";
 import Bet from "./bet";
 import { Button } from "../ui/button";
 import { usePrivy } from "@privy-io/react-auth";
-// import ConnectWallet from "../connectWallet";
 
 const Game = ({
   spin,
@@ -18,8 +17,21 @@ const Game = ({
   setBetSuccess,
   play,
   betSuccess,
+  start
 }) => {
   const { login } = usePrivy();
+
+  useEffect(() => {
+    const audioElement = document.getElementById('backgroundMusic');
+    if (!audioElement) return; // Return if audio element is not found
+
+    if (start) {
+      audioElement.play();
+    } else {
+      audioElement.pause();
+    }
+  }, [start]);
+
   return (
     <div>
       <div className="grid grid-cols-3 gap-4 h-[293px] overflow-hidden rounded-lg">
@@ -36,8 +48,8 @@ const Game = ({
       {authenticated ? (
         <div>
           {betSuccess ? (
-            <Button onClick={play} className="w-full mt-4">
-              Play
+            <Button onClick={play} disabled={start} className="w-full mt-4 text-black">
+              Bet 100 Bugs
             </Button>
           ) : (
             <div>
@@ -50,6 +62,8 @@ const Game = ({
           Connect
         </Button>
       )}
+      {/* Make sure to replace 'src' with the correct path to your audio file */}
+      <audio id="backgroundMusic" src="./final_tune.mp3" className="w-0 h-0" autoPlay loop /> 
     </div>
   );
 };
