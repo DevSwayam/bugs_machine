@@ -58,7 +58,7 @@ const Game = ({
           )}
         </div>
       ) : (
-        <Button className="w-full mt-8" onClick={login}>
+        <Button className="w-full mt-8 text-black" onClick={login}>
           Connect
         </Button>
       )}
