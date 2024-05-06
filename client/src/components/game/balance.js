@@ -15,7 +15,7 @@ const Balance = ({ allowed, setAllowed, bugBalance }) => {
         <div className="flex justify-between w-full">
           {/* <p className="text-sm mb-2">Allowance:</p> */}
           <p className="text-left ">Allowance: </p>
-          <p>{allowed.slice(0, -18)}Bugs</p>
+          <p>{allowed === "0" ? "0" : allowed.slice(0, -18)}Bugs</p>
         </div>
       </div>
       <div className="w-full flex">
