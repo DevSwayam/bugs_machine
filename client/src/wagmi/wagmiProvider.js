@@ -4,7 +4,7 @@ import { PrivyProvider } from "@privy-io/react-auth";
 
 const CustomPrivyProvider = ({ children }) => {
   return (
-    <PrivyProvider
+<PrivyProvider
       appId="cltn4pfm807ld12sf83bqr3iy"
       config={{
         logo: "https://your.logo.url",
@@ -22,6 +22,7 @@ const CustomPrivyProvider = ({ children }) => {
           // Defaults to 'light'
           theme: "dark",
         },
+        defaultChain: redStone,
         supportedChains: [redStone],
 
         embeddedWallets: {

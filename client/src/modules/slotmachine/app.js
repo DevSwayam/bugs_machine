@@ -176,7 +176,7 @@ const App = () => {
       getBugBalance();
     }
   }, [w0]);
-  // http://localhost:8080/api/
+
   const getRandomNumber = async () => {
     if (address !== "") {
       const { data } = await axios.get(
@@ -262,6 +262,7 @@ const App = () => {
           <p>Allowance</p>
           )}
         </div> */}
+        
         <div className="col-span-2">
           {authenticated && (
             <Balance
