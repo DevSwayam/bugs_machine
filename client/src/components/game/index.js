@@ -58,7 +58,7 @@ const Game = ({
               </Button>
               <div className="col-span-2 mt-5 text-center">
                 <Link href={"/mint"}>
-                  <p>Mint Test Bugs</p>
+                  <p className="underline">Mint Test Bugs</p>
                 </Link>
               </div>
             </div>
