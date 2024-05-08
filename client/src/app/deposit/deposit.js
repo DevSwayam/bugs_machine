@@ -14,7 +14,6 @@ const Deposit = ({ depositAmmount, setDepositAmmount }) => {
   const { wallets } = useWallets();
   const w0 = wallets[0];
   async function addNetwork() {
-    console.info("Adding network");
     const provider = await w0?.getEthersProvider();
     //Request to add Inco chain
     await provider?.send("wallet_addEthereumChain", [
@@ -54,7 +53,6 @@ const Deposit = ({ depositAmmount, setDepositAmmount }) => {
         price
       );
     } catch (error) {
-      console.log(error);
       toast("Error Occured!");
       // setSpin(false);
     }
@@ -75,23 +73,17 @@ const Deposit = ({ depositAmmount, setDepositAmmount }) => {
       signer
     );
     const address = w0.address;
-    // console.log(address);
-    console.log(address);
     try {
       const totalAllowance = await contractSM.allowance(
         address,
         "0x55df62A91801622B70026Aa8D0Ba3d1B8AaDEA7b"
         // price
       );
-      console.log(totalAllowance);
 
       const bigNumber = ethers.BigNumber.from(totalAllowance);
       const calculateAllowance = parseInt(bigNumber.toString());
-      console.log(calculateAllowance);
-      // console.log(calculateAllowance.toString());
       setAllowed(calculateAllowance.toString());
     } catch (error) {
-      console.log(error);
       toast("Error Occured!");
       // setSpin(false);
     }

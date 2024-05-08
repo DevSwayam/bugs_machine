@@ -11,7 +11,6 @@ const Navbar = () => {
   const { ready, user, login, logout, authenticated } = usePrivy();
   const { wallets } = useWallets();
   const w0 = wallets[0];
-  // console.log(user);
   const [isWithdraw, setIsWithdraw] = useState(false);
   const [isDeposite, setIsDeposite] = useState(false);
   const [isMint, setIsMint] = useState(false);
@@ -29,7 +28,6 @@ const Navbar = () => {
     else setIsMint(false);
   }, [pathname]);
 
-  //   console.log(account)
   const accountAddress = w0?.address?.slice(0, 6)?.toLocaleLowerCase();
 
   return (

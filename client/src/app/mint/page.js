@@ -33,10 +33,8 @@ const Page = () => {
       const balance = await contractSM.balanceOf(address);
 
       const bigNumber = ethers.BigNumber.from(balance);
-      console.log(bigNumber.toString());
       setBugBalance(bigNumber.toString());
     } catch (error) {
-      console.log(error);
       toast("Error Occured!");
       // setSpin(false);
     }
@@ -60,18 +58,11 @@ const Page = () => {
 
     try {
       const balance = await contractSM.transferFromOwner();
-      //   console.log(balance);
       contractSM.on("Transfer", (from, to, amount, event) => {
-        console.log("Transfer event received:");
-        console.log("From:", from);
-        console.log("To:", to);
-        console.log("Amount:", amount.toString());
-        console.log("Event:", event);
         getBugBalance();
         setIsMintBugDisable(false);
       });
     } catch (error) {
-      console.log(error);
       toast("Error Occured!");
       // setSpin(false);
     }

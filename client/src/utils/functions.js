@@ -97,8 +97,6 @@ export function numChecker(e, setInput) {
       signer
     );
 
-    console.log(withdrawAmmount);
-    console.log(w0.address);
     try {
       const totalAllowance = await contractSM.allowance(
         w0.address,
@@ -107,9 +105,7 @@ export function numChecker(e, setInput) {
       );
 
       const calculateAllowance = parseInt(totalAllowance, 16);
-      console.log(calculateAllowance);
     } catch (error) {
-      console.log(error);
       toast("Error Occured!");
       // setSpin(false);
     }
