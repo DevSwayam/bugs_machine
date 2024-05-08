@@ -15,6 +15,7 @@ import { toast } from "sonner";
 import axios from "axios";
 import SlotMachineABI from "@/assets/Slotmachine.json";
 import AlertModal from "@/components/alert";
+import Link from "next/link";
 // import { bugsContract } from "@/contracts/bugs";
 
 const App = () => {
@@ -41,7 +42,7 @@ const App = () => {
   const [address, setAddress] = useState("");
   const [popup, setPopup] = useState(false);
   const [bugBalance, setBugBalance] = useState("0");
-  const [start,setStart] = useState(false);
+  const [start, setStart] = useState(false);
   // useEffect(() => {
   //   bugsContract(w0, addNetwork, bugsABI);
   // }, []);
@@ -70,13 +71,12 @@ const App = () => {
       rand();
       setTimeout(() => {
         setPopup(true);
-        checkAllowance()
-        getBugBalance()
+        checkAllowance();
+        getBugBalance();
       }, 1000);
       setValue(-1);
-      setStart(false)
+      setStart(false);
     }
-  
   }, [value]);
 
   useEffect(() => {
@@ -125,7 +125,7 @@ const App = () => {
       setBugBalance(bigNumber.toString());
     } catch (error) {
       console.log(error);
-      setStart(false)
+      setStart(false);
       toast("Error Occured!");
       // setSpin(false);
     }
@@ -164,7 +164,7 @@ const App = () => {
       setAllowed(bigNumber.toString());
     } catch (error) {
       console.log(error);
-      setStart(false)
+      setStart(false);
       toast("Error Occured!");
       // setSpin(false);
     }
@@ -217,7 +217,7 @@ const App = () => {
           );
           if (count === 1) {
             setValue(bugsAmountWonByUser.toString());
-            setStart(false)
+            setStart(false);
             setwonPrize(bugsAmountWonByUser.toString());
           }
           console.log("Event:", event);
@@ -262,7 +262,7 @@ const App = () => {
           <p>Allowance</p>
           )}
         </div> */}
-        
+
         <div className="col-span-2">
           {authenticated && (
             <Balance

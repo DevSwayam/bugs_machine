@@ -16,7 +16,6 @@ const CustomPrivyProvider = ({ children }) => {
           walletList: [
             "metamask",
             "detected_wallets",
-            "wallet_connect",
             "rainbow",
           ],
           // Defaults to 'light'
