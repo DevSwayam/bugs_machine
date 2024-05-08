@@ -19,7 +19,7 @@ export default function RootLayout({ children }) {
     <html lang="en">
       <body className={sixtyfour.className}>
         <CustomPrivyProvider>
-          <ThemeProvider attribute="class" defaultTheme="light">
+          <ThemeProvider attribute="class" defaultTheme="dark">
             <Toaster />
 
             <div className="min-h-screen bg-black relative w-full overflow-hidden flex flex-col items-center justify-center">
