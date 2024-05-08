@@ -8,7 +8,6 @@ import Bug from "@/assets/bugs.png";
 import Drug from "@/assets/drug.png";
 
 const Result = ({ price, ring3 }) => {
-  // console.log(price)
   if (price === 1 && ring3 > 1) {
     return (
       <div className="flex flex-col items-center justify-center">

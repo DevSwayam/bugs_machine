@@ -16,7 +16,6 @@ export const WalletInfo = ({ accountAddress }) => {
                 <div className="w-full flex justify-between">
                   <button type="button" className="bg-[#BCD0FC]">
                     {accountAddress+'...'}
-                    {/* {console.log(account)} */}
                     {account.displayBalance
                       ? ` (${account.displayBalance})`
                       : ""}

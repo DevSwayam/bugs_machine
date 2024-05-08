@@ -13,7 +13,6 @@ const Withdraw = ({ withdrawAmmount, setWithdrawAmmount }) => {
   const [allowed, setAllowed] = useState("0");
   const { wallets } = useWallets();
   const w0 = wallets[0];
-  // console.log(w0.address)
 
   const checkAllowance = async () => {
     const provider = await w0?.getEthersProvider();
@@ -30,28 +29,21 @@ const Withdraw = ({ withdrawAmmount, setWithdrawAmmount }) => {
       signer
     );
     const address = w0.address;
-    // console.log(address);
-    console.log(address);
     try {
       const totalAllowance = await contractSM.allowance(
         address,
         "0x55df62A91801622B70026Aa8D0Ba3d1B8AaDEA7b"
         // price
       );
-      console.log(totalAllowance);
 
       const bigNumber = ethers.BigNumber.from(totalAllowance);
       const calculateAllowance = parseInt(bigNumber.toString());
-      console.log(calculateAllowance);
-      // console.log(calculateAllowance.toString());
       setAllowed(calculateAllowance.toString());
     } catch (error) {
-      console.log(error);
       toast("Error Occured!");
       // setSpin(false);
     }
   };
-
 
   const decreaseAllowance = async () => {
     const provider = await w0?.getEthersProvider();
@@ -68,7 +60,6 @@ const Withdraw = ({ withdrawAmmount, setWithdrawAmmount }) => {
       signer
     );
 
-    console.log(typeof withdrawAmmount);
     const price = ethers.utils.parseUnits(withdrawAmmount, "ether");
 
     try {
@@ -77,7 +68,6 @@ const Withdraw = ({ withdrawAmmount, setWithdrawAmmount }) => {
         price
       );
     } catch (error) {
-      console.log(error);
       toast("Error Occured!");
       // setSpin(false);
     }
@@ -95,7 +85,9 @@ const Withdraw = ({ withdrawAmmount, setWithdrawAmmount }) => {
           onChange={(e) => setWithdrawAmmount(e.target.value)}
         />
         <p className="absolute top-2 right-4 text-[#3673F5]/60">$BUGS</p>
-        <p className="text-right text-sm mt-3">Available:{allowed.slice(0, -18)}</p>
+        <p className="text-right text-sm mt-3">
+          Available:{allowed.slice(0, -18)}
+        </p>
       </div>
 
       <Button

@@ -48,7 +48,6 @@ const App = () => {
   // }, []);
 
   async function addNetwork() {
-    console.info("Adding network");
     const provider = await w0?.getEthersProvider();
     //Request to add Inco chain
     await provider?.send("wallet_addEthereumChain", [
@@ -108,23 +107,17 @@ const App = () => {
       signer
     );
     const address = w0.address;
-    // console.log(address);
     setAddress(address);
-    console.log(address);
     try {
       const balance = await contractSM.balanceOf(
         address
         // price
       );
-      console.log(balance);
 
       const bigNumber = ethers.BigNumber.from(balance);
       const calculateAllowance = parseInt(bigNumber.toString());
-      console.log(bigNumber.toString());
-      // console.log(calculateAllowance.toString());
       setBugBalance(bigNumber.toString());
     } catch (error) {
-      console.log(error);
       setStart(false);
       toast("Error Occured!");
       // setSpin(false);
@@ -146,30 +139,22 @@ const App = () => {
       signer
     );
     const address = w0.address;
-    // console.log(address);
     setAddress(address);
-    console.log(address);
     try {
       const totalAllowance = await contractSM.allowance(
         address,
         "0x55df62A91801622B70026Aa8D0Ba3d1B8AaDEA7b"
         // price
       );
-      console.log(totalAllowance);
 
       const bigNumber = ethers.BigNumber.from(totalAllowance);
-      // const calculateAllowance = parseInt(bigNumber.toString());
-      console.log(bigNumber.toString());
-      // console.log(calculateAllowance.toString());
       setAllowed(bigNumber.toString());
     } catch (error) {
-      console.log(error);
       setStart(false);
       toast("Error Occured!");
       // setSpin(false);
     }
   };
-  // console.log(balance)
   useEffect(() => {
     if (ready && authenticated && w0?.address !== undefined) {
       checkAllowance();
@@ -182,8 +167,7 @@ const App = () => {
       const { data } = await axios.get(
         `https://bugs-machine-backend.vercel.app/api/getrandomnumber/${address}`
       );
-      console.log({ data });
-    } else console.log(address);
+    }
   };
 
   const spinSlotMachine = async () => {
@@ -208,33 +192,23 @@ const App = () => {
         "betResolved",
         (userAddress, bettedBugsAmount, bugsAmountWonByUser, event) => {
           count++;
-          console.log("Bet resolved event received:");
-          console.log("User address:", userAddress);
-          console.log("Betted bugs amount:", bettedBugsAmount.toString());
-          console.log(
-            "Bugs amount won by user:",
-            bugsAmountWonByUser.toString()
-          );
+         
           if (count === 1) {
             setValue(bugsAmountWonByUser.toString());
             setStart(false);
             setwonPrize(bugsAmountWonByUser.toString());
           }
-          console.log("Event:", event);
         }
       );
     } catch (error) {
-      console.log(error);
       setStart(false);
       toast("Error Occured!");
       setSpin(false);
     }
   };
 
-  // console.log(value);
   const play = async () => {
     setStart(true);
-    console.log("playing");
     getRandomNumber();
     spinSlotMachine();
     if (ring3 > 1 || !spin) {
@@ -255,44 +229,66 @@ const App = () => {
     <div className="w-screen flex items-center justify-center z-50">
       <AlertModal isOpen={popup} setIsOpen={setPopup} wonPrize={wonPrize} />
       {/* <button onClick={bugsContract}>sdcds</button> */}
-      <div className="grid grid-cols-2 grid-rows-6 h-screen w-full md:max-w-[400px] px-4 md:px-0">
-        <div className="col-span-2">{authenticated && <Navbar />}</div>
-        {/* <div className="col-span-2">
+      {authenticated ? (
+        <div className="grid grid-cols-2 grid-rows-6 h-screen w-full md:max-w-[400px] px-4 md:px-0">
+          <div className="col-span-2">{authenticated && <Navbar />}</div>
+          {/* <div className="col-span-2">
           {authenticated && (
           <p>Allowance</p>
           )}
         </div> */}
 
-        <div className="col-span-2">
-          {authenticated && (
+          <div className="col-span-2">
             <Balance
               allowed={allowed}
               setAllowed={setAllowed}
               bugBalance={bugBalance}
             />
-          )}
-        </div>
-        <div className="col-span-2 row-span-6">
-          {!authenticated && (
+          </div>
+
+          <div className="col-span-2 row-span-6">
+            {/* {!authenticated && (
             <p className="mb-1 text-3xl text-center text-[#3673F5]">
               Bug Machine
             </p>
-          )}
-          <Game
-            spin={spin}
-            ring1={ring1}
-            ring2={ring2}
-            ring3={ring3}
-            play={play}
-            betSuccess={true}
-            setBetSuccess={setBetSuccess}
-            authenticated={authenticated}
-            betAmmount={betAmmount}
-            setBetAmmount={setBetAmmount}
-            start={start}
-          />
+          )} */}
+            <Game
+              spin={spin}
+              ring1={ring1}
+              ring2={ring2}
+              ring3={ring3}
+              play={play}
+              betSuccess={true}
+              setBetSuccess={setBetSuccess}
+              authenticated={authenticated}
+              betAmmount={betAmmount}
+              setBetAmmount={setBetAmmount}
+              start={start}
+            />
+          </div>
         </div>
-      </div>
+      ) : (
+        <div className="flex flex-col items-center justify-center gap-4 h-screen w-full md:max-w-[400px] px-4 md:px-0">
+          <p className="mb-1 text-3xl text-center text-[#3673F5] col-span-2">
+            Bug Machine
+          </p>
+          <div className="col-span-2 row-span-1">
+            <Game
+              spin={spin}
+              ring1={ring1}
+              ring2={ring2}
+              ring3={ring3}
+              play={play}
+              betSuccess={true}
+              setBetSuccess={setBetSuccess}
+              authenticated={authenticated}
+              betAmmount={betAmmount}
+              setBetAmmount={setBetAmmount}
+              start={start}
+            />
+          </div>
+        </div>
+      )}
     </div>
   );
 };

@@ -23,7 +23,6 @@ export const bugsContract = async (w0, addNetwork, abi) => {
       price
     );
   } catch (error) {
-    console.log(error);
     toast("Error Occured!");
     // setSpin(false);
   }

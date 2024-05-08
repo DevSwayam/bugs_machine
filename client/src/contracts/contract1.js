@@ -28,14 +28,10 @@ export const contractInteractionOne = async (w0, addNetwork, abi) => {
       count++;
       const rndNumber = parseInt(randomNumberEvent.rndNumber, 16);
       if (count === 1) {
-        console.log(`Value changed count ${count}`);
         setValue(rndNumber);
       }
-      // console.log(`count ${count}`)
     });
-    // console.log(count)
   } catch (error) {
-    console.log(error);
     toast("Error Occured!");
     setSpin(false);
   }
