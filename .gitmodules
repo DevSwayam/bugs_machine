@@ -1,0 +1,9 @@
+[submodule "contracts/lib/openzeppelin-contracts"]
+	path = contracts/lib/openzeppelin-contracts
+	url = https://github.com/OpenZeppelin/openzeppelin-contracts
+[submodule "contracts/lib/fhevm"]
+	path = contracts/lib/fhevm
+	url = https://github.com/zama-ai/fhevm
+[submodule "contracts/lib/openzeppelin-contracts-06"]
+	path = contracts/lib/openzeppelin-contracts-06
+	url = https://github.com/OpenZeppelin/openzeppelin-contract

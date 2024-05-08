@@ -2,7 +2,7 @@
 
 pragma solidity >=0.8.2 <0.9.0;
 
-import {IERC20} from "https://github.com/OpenZeppelin/openzeppelin-contracts/blob/release-v4.9/contracts/interfaces/IERC20.sol";
+import {IERC20} from "../lib/openzeppelin-contracts/contracts/interfaces/IERC20.sol";
 
 /*//////////////////////////////////////////////////////////////
                             INTERFACE
@@ -24,10 +24,10 @@ interface IInterchainAccountRouter {
         bytes calldata _data
     ) external returns (bytes32);
 
-    function getRemoteInterchainAccount(uint32 _destination, address _owner)
-        external
-        view
-        returns (address);
+    function getRemoteInterchainAccount(
+        uint32 _destination,
+        address _owner
+    ) external view returns (address);
 }
 
 contract SlotMachine is ISlotMachine {
@@ -51,7 +51,8 @@ contract SlotMachine is ISlotMachine {
     mapping(address => bool) private s_UserAddressToIsWaiting;
 
     // Bugs amount to bet
-    uint256 private s_BettingBugsAmount = 100 * 10**18;
+    uint256 private s_BettingBugsAmount = 100 * 10 ** 18;
+    uint256 private s_InitialBugBalance = 500 * 10 ** 18;
 
     // Users to there Betted Bug Amount
     mapping(address => uint256) private s_UserAddressToBettedBugAmount;
@@ -85,6 +86,8 @@ contract SlotMachine is ISlotMachine {
     error SlotMachine__NotEnoughBugsAmount();
     error SlotMachine__UserDidntPutABet();
     error SlotMachine__UserApprovalAmountIsNotSufficient();
+    error SlotMachine__DoesNotHaveEnoughBugsToWithDraw();
+    error SlotMachine__DoesNotHaveEnoughBugsToPlay();
 
     /*//////////////////////////////////////////////////////////////
                                MODIFIERS
@@ -111,8 +114,18 @@ contract SlotMachine is ISlotMachine {
         _;
     }
 
+    modifier _isPlayable() {
+        uint256 _bugBalanceOfContract = IERC20(s_BugsContractAddress).balanceOf(
+            address(this)
+        );
+        if (_bugBalanceOfContract < s_InitialBugBalance) {
+            revert SlotMachine__DoesNotHaveEnoughBugsToPlay();
+        }
+        _;
+    }
+
     modifier _onlyOnce() {
-        if (s_UserAddressToIsWaiting[msg.sender] == true ) {
+        if (s_UserAddressToIsWaiting[msg.sender] == true) {
             revert SlotMachine__WaitingToGetResolved();
         }
         _;
@@ -121,7 +134,7 @@ contract SlotMachine is ISlotMachine {
     /*//////////////////////////////////////////////////////////////
                                 Constructor
     //////////////////////////////////////////////////////////////*/
-    
+
     constructor() {
         i_Owner = msg.sender;
     }
@@ -130,22 +143,20 @@ contract SlotMachine is ISlotMachine {
                                 External Functions
     //////////////////////////////////////////////////////////////*/
 
-    function initialize(address _callerContract, address _bugsContractAddress)
-        external
-        _onlyOwner
-        _isInitialised
-    {
+    function initialize(
+        address _callerContract,
+        address _bugsContractAddress
+    ) external _onlyOwner _isInitialised {
         s_CallerContract = _callerContract;
         s_BugsContractAddress = _bugsContractAddress;
         s_IsInitialised = true;
     }
 
-    function spinSlotMachine() external _onlyOnce {
+    function spinSlotMachine() external _onlyOnce _isPlayable {
         address _userAddress = msg.sender;
 
         IERC20 _bugs = IERC20(s_BugsContractAddress);
 
-        
         // check the balance of user from bugs contract if not sufficient revert
         uint256 _userBugsBalance = _bugs.balanceOf(_userAddress);
 
@@ -176,24 +187,21 @@ contract SlotMachine is ISlotMachine {
         emit betPlaced(_userAddress, s_BettingBugsAmount);
     }
 
-    function updateBettingBugsAmount(uint256 _newBettingBugAmount)
-        external
-        _onlyOwner
-    {
+    function updateBettingBugsAmount(
+        uint256 _newBettingBugAmount
+    ) external _onlyOwner {
         s_BettingBugsAmount = _newBettingBugAmount;
     }
 
-    function updateCallerContract(address _newCallerContractAddress)
-        external
-        _onlyOwner
-    {
+    function updateCallerContract(
+        address _newCallerContractAddress
+    ) external _onlyOwner {
         s_CallerContract = _newCallerContractAddress;
     }
 
-    function updateBugsContract(address _newBugsContractAddress)
-        external
-        _onlyOwner
-    {
+    function updateBugsContract(
+        address _newBugsContractAddress
+    ) external _onlyOwner {
         s_BugsContractAddress = _newBugsContractAddress;
     }
 
@@ -206,16 +214,15 @@ contract SlotMachine is ISlotMachine {
             revert SlotMachine__UserDidntPutABet();
         }
 
-        // event emit the last uniqueId, randomNumber and userAddress
         emit randomNumberUsed(_randomNumber, _uniqueId, _userAddress);
 
-        // send the random number to resolveTheWinner
         resolveWinner(_userAddress, _randomNumber);
     }
 
-    function resolveWinner(address _userAddress, uint16 _randomNumber)
-        internal
-    {
+    function resolveWinner(
+        address _userAddress,
+        uint16 _randomNumber
+    ) internal {
         uint8 _moduloResult = uint8(_randomNumber % 10);
         uint256 _bugsAmountWonByUser;
         uint256 _bettedBugsAmount = s_UserAddressToBettedBugAmount[
@@ -249,14 +256,41 @@ contract SlotMachine is ISlotMachine {
 
         // set s_UserAddressToBettedBugAmount to 0
         s_UserAddressToBettedBugAmount[_userAddress] = 0;
-
     }
 
+    function withdrawSlotMachineBugs(
+        address _withDrawAddress
+    ) external _onlyOwner {
+        IERC20 _bugs = IERC20(s_BugsContractAddress);
+        uint256 _bugBalanceOfContract = _bugs.balanceOf(address(this));
+        if (_bugBalanceOfContract == 0) {
+            revert SlotMachine__DoesNotHaveEnoughBugsToWithDraw();
+        }
+        _bugs.transferFrom(
+            address(this),
+            _withDrawAddress,
+            _bugBalanceOfContract
+        );
+    }
+
+    function withdrawSlotMachineProfit(address _withDrawAddress) external _onlyOwner {
+        IERC20 _bugs = IERC20(s_BugsContractAddress);
+        uint256 _bugBalanceOfContract = _bugs.balanceOf(address(this));
+        if (_bugBalanceOfContract < s_InitialBugBalance) {
+            revert SlotMachine__DoesNotHaveEnoughBugsToWithDraw();
+        }
+
+        _bugs.transferFrom(
+            address(this),
+            _withDrawAddress,
+            _bugBalanceOfContract - s_InitialBugBalance
+        );
+    }
 
     /*//////////////////////////////////////////////////////////////
                                Getter Functions
     //////////////////////////////////////////////////////////////*/
-    
+
     function getCallerContract() external view returns (address) {
         return s_CallerContract;
     }
@@ -273,11 +307,9 @@ contract SlotMachine is ISlotMachine {
         return s_BugsContractAddress;
     }
 
-    function getUserAddressToIsWaiting(address userAddress)
-        external
-        view
-        returns (bool)
-    {
+    function getUserAddressToIsWaiting(
+        address userAddress
+    ) external view returns (bool) {
         return s_UserAddressToIsWaiting[userAddress];
     }
 
@@ -285,11 +317,9 @@ contract SlotMachine is ISlotMachine {
         return s_BettingBugsAmount;
     }
 
-    function getUserAddressToBettedBugAmount(address userAddress)
-        external
-        view
-        returns (uint256)
-    {
+    function getUserAddressToBettedBugAmount(
+        address userAddress
+    ) external view returns (uint256) {
         return s_UserAddressToBettedBugAmount[userAddress];
     }
 }
