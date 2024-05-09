@@ -43,9 +43,14 @@ const App = () => {
   const [popup, setPopup] = useState(false);
   const [bugBalance, setBugBalance] = useState("0");
   const [start, setStart] = useState(false);
-  // useEffect(() => {
-  //   bugsContract(w0, addNetwork, bugsABI);
-  // }, []);
+
+  useEffect(() => {
+    if (start) {
+      toast(
+        "Bet can take some time to get reslut till then please wait paitently.."
+      );
+    }
+  }, [start]);
 
   async function addNetwork() {
     const provider = await w0?.getEthersProvider();
@@ -192,7 +197,7 @@ const App = () => {
         "betResolved",
         (userAddress, bettedBugsAmount, bugsAmountWonByUser, event) => {
           count++;
-         
+
           if (count === 1) {
             setValue(bugsAmountWonByUser.toString());
             setStart(false);
@@ -204,6 +209,22 @@ const App = () => {
       setStart(false);
       toast("Error Occured!");
       setSpin(false);
+    }
+  };
+
+  const forceWithdrawal = async () => {
+    const provider = await w0?.getEthersProvider();
+    const signer = await provider?.getSigner();
+
+    const contractSM = new Contract(
+      "0x55df62A91801622B70026Aa8D0Ba3d1B8AaDEA7b",
+      SlotMachineABI,
+      signer
+    );
+    try {
+      await contractSM.forceWithdrawlIfBridgeTransactionFails();
+    } catch (error) {
+      toast("Error Occured!");
     }
   };
 
@@ -253,6 +274,7 @@ const App = () => {
             </p>
           )} */}
             <Game
+              forceWithdrawal={forceWithdrawal}
               spin={spin}
               ring1={ring1}
               ring2={ring2}
