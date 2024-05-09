@@ -78,9 +78,9 @@ const Withdraw = ({ withdrawAmmount, setWithdrawAmmount }) => {
           onChange={(e) => setWithdrawAmmount(e.target.value)}
         />
         <p className="absolute top-2 right-4 text-[#3673F5]/60">$BUGS</p>
-        <p className="text-right text-sm mt-3">
+        {/* <p className="text-right text-sm mt-3">
           Available:{allowed === "0" ? "0" : allowed.slice(0, -18)}
-        </p>
+        </p> */}
       </div>
 
       <Button
