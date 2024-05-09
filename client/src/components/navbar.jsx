@@ -14,6 +14,7 @@ const Navbar = () => {
   const [isWithdraw, setIsWithdraw] = useState(false);
   const [isDeposite, setIsDeposite] = useState(false);
   const [isMint, setIsMint] = useState(false);
+  const [info, setInfo] = useState(false);
   const pathname = usePathname();
   const router = useRouter();
 
@@ -26,13 +27,16 @@ const Navbar = () => {
 
     if (pathname === "/mint") setIsMint(true);
     else setIsMint(false);
+
+    if (pathname === "/info") setInfo(true);
+    else setInfo(false);
   }, [pathname]);
 
   const accountAddress = w0?.address?.slice(0, 6)?.toLocaleLowerCase();
 
   return (
     <div className="mt-10 z-50">
-      {authenticated && !isDeposite && !isWithdraw && !isMint && (
+      {authenticated && !isDeposite && !isWithdraw && !isMint && !info && (
         <div className="w-full flex justify-between  text-[#02200D]">
           <p className="bg-[#BCD0FC]">{accountAddress + "..."}</p>
           <Image src={LogoutIcon} alt="logout" onClick={logout} />
@@ -57,6 +61,13 @@ const Navbar = () => {
         <div className="w-full text-center flex items-center justify-between">
           <Image src={BackImg} alt="back" onClick={() => router.push("/")} />{" "}
           <p>Mint Bugs</p> <p></p>
+        </div>
+      )}
+
+      {info && (
+        <div className="w-full text-center flex items-center justify-between">
+          <Image src={BackImg} alt="back" onClick={() => router.push("/")} />{" "}
+          <p>Bug Slot Machine</p> <p></p>
         </div>
       )}
     </div>

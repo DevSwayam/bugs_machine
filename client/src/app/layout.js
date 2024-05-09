@@ -5,7 +5,7 @@ import { ThemeProvider } from "@/theme/themeProvider";
 import { Toaster } from "@/components/ui/sonner";
 import Image from "next/image";
 import backgroundImg from "@/assets/incoBg.jpg";
-import CustomPrivyProvider from "@/wagmi/wagmiProvider";
+import CustomPrivyProvider from "@/privy/privyProvider";
 
 const sixtyfour = Sixtyfour({ subsets: ["latin"], display: "swap" });
 

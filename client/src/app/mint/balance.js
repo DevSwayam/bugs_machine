@@ -9,6 +9,7 @@ const BugBalance = ({ bugBalance, mintBugs, btnDisabled }) => {
         <p className="text-left text-sm mt-3">
           Available:{bugBalance.slice(0, -18)}
         </p>
+        
       </div>
 
       <Button

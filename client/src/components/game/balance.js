@@ -1,6 +1,8 @@
 import React, { useEffect, useState } from "react";
 import { Button } from "../ui/button";
 import Link from "next/link";
+import { Info } from "lucide-react";
+import { AlertDialogComp } from "@/modules/info/alert";
 
 const Balance = ({ allowed, setAllowed, bugBalance }) => {
   // const { address } = account;
@@ -10,7 +12,9 @@ const Balance = ({ allowed, setAllowed, bugBalance }) => {
     // fetchData();
   }, []);
   return (
-    <div className="w-full flex flex-col justify-between items-center text-[#BCD0FC]">
+    <div className="w-full flex gap-2 flex-col justify-between items-center text-[#BCD0FC]">
+      <AlertDialogComp />
+
       <div className="w-full flex">
         <div className="flex justify-between w-full">
           {/* <p className="text-sm mb-2">Allowance:</p> */}

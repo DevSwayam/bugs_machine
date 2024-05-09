@@ -32,6 +32,7 @@ export const contractInteractionOne = async (w0, addNetwork, abi) => {
       }
     });
   } catch (error) {
+    
     toast("Error Occured!");
     setSpin(false);
   }

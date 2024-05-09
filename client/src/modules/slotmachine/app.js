@@ -1,32 +1,22 @@
 import Game from "@/components/game";
 import Balance from "@/components/game/balance";
-import Bet from "@/components/game/bet";
 import Navbar from "@/components/navbar";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
 import { win } from "@/utils/functions";
 import { usePrivy, useWallets } from "@privy-io/react-auth";
 import React, { useEffect, useState } from "react";
-import truncateEthAddress from "truncate-eth-address";
-import { useAccount } from "wagmi";
-import bugsABI from "@/assets/bugsAbi.json";
 import { Contract, ethers } from "ethers";
 import { toast } from "sonner";
 import axios from "axios";
-import SlotMachineABI from "@/assets/Slotmachine.json";
 import AlertModal from "@/components/alert";
-import Link from "next/link";
+import { SlotMachineABI, bugsABI, bugsContractAddress, slotMachineContractAddress } from "@/addresses";
 // import { bugsContract } from "@/contracts/bugs";
 
 const App = () => {
-  const { ready, user, login, logout, authenticated } = usePrivy();
+  const { ready, authenticated } = usePrivy();
   const [allowed, setAllowed] = useState("0");
   const { wallets } = useWallets();
   const w0 = wallets[0];
-  const walletAddress = truncateEthAddress(user?.wallet?.address || "");
   const [wonPrize, setwonPrize] = useState(0);
-  const [slotMachineContract, setSlotMachineContract] = useState();
-  const [numberCall, setNumberCall] = useState(false);
   const [spin, setSpin] = useState(false);
   const [ring1, setRing1] = useState();
   const [ring2, setRing2] = useState();
@@ -43,9 +33,15 @@ const App = () => {
   const [popup, setPopup] = useState(false);
   const [bugBalance, setBugBalance] = useState("0");
   const [start, setStart] = useState(false);
-  // useEffect(() => {
-  //   bugsContract(w0, addNetwork, bugsABI);
-  // }, []);
+  const backendAPI = process.env.backendAPI;
+
+  useEffect(() => {
+    if (start) {
+      toast(
+        "Bet can take some time to get reslut till then please wait paitently.."
+      );
+    }
+  }, [start]);
 
   async function addNetwork() {
     const provider = await w0?.getEthersProvider();
@@ -101,11 +97,7 @@ const App = () => {
 
     const signer = await provider?.getSigner();
 
-    const contractSM = new Contract(
-      "0x8ED8E66977541B6Ad412AA5CA7f21d21A7e565c1",
-      bugsABI,
-      signer
-    );
+    const contractSM = new Contract(bugsContractAddress, bugsABI, signer);
     const address = w0.address;
     setAddress(address);
     try {
@@ -115,7 +107,6 @@ const App = () => {
       );
 
       const bigNumber = ethers.BigNumber.from(balance);
-      const calculateAllowance = parseInt(bigNumber.toString());
       setBugBalance(bigNumber.toString());
     } catch (error) {
       setStart(false);
@@ -133,17 +124,14 @@ const App = () => {
 
     const signer = await provider?.getSigner();
 
-    const contractSM = new Contract(
-      "0x8ED8E66977541B6Ad412AA5CA7f21d21A7e565c1",
-      bugsABI,
-      signer
-    );
+    const contractSM = new Contract(bugsContractAddress, bugsABI, signer);
     const address = w0.address;
     setAddress(address);
     try {
       const totalAllowance = await contractSM.allowance(
         address,
-        "0x55df62A91801622B70026Aa8D0Ba3d1B8AaDEA7b"
+        slotMachineContractAddress
+        
         // price
       );
 
@@ -164,9 +152,11 @@ const App = () => {
 
   const getRandomNumber = async () => {
     if (address !== "") {
-      const { data } = await axios.get(
-        `https://bugs-machine-backend.vercel.app/api/getrandomnumber/${address}`
-      );
+      try {
+        const { data } = await axios.get(
+          `${backendAPI}/getrandomnumber/${address}`
+        );
+      } catch (error) {}
     }
   };
 
@@ -181,7 +171,7 @@ const App = () => {
     setSpin(true);
 
     const contractSM = new Contract(
-      "0x55df62A91801622B70026Aa8D0Ba3d1B8AaDEA7b",
+      slotMachineContractAddress,
       SlotMachineABI,
       signer
     );
@@ -192,7 +182,7 @@ const App = () => {
         "betResolved",
         (userAddress, bettedBugsAmount, bugsAmountWonByUser, event) => {
           count++;
-         
+
           if (count === 1) {
             setValue(bugsAmountWonByUser.toString());
             setStart(false);
@@ -204,6 +194,22 @@ const App = () => {
       setStart(false);
       toast("Error Occured!");
       setSpin(false);
+    }
+  };
+
+  const forceWithdrawal = async () => {
+    const provider = await w0?.getEthersProvider();
+    const signer = await provider?.getSigner();
+
+    const contractSM = new Contract(
+      slotMachineContractAddress,
+      SlotMachineABI,
+      signer
+    );
+    try {
+      await contractSM.forceWithdrawlIfBridgeTransactionFails();
+    } catch (error) {
+      toast("Error Occured!");
     }
   };
 
@@ -228,15 +234,9 @@ const App = () => {
   return (
     <div className="w-screen flex items-center justify-center z-50">
       <AlertModal isOpen={popup} setIsOpen={setPopup} wonPrize={wonPrize} />
-      {/* <button onClick={bugsContract}>sdcds</button> */}
       {authenticated ? (
         <div className="grid grid-cols-2 grid-rows-6 h-screen w-full md:max-w-[400px] px-4 md:px-0">
           <div className="col-span-2">{authenticated && <Navbar />}</div>
-          {/* <div className="col-span-2">
-          {authenticated && (
-          <p>Allowance</p>
-          )}
-        </div> */}
 
           <div className="col-span-2">
             <Balance
@@ -247,12 +247,8 @@ const App = () => {
           </div>
 
           <div className="col-span-2 row-span-6">
-            {/* {!authenticated && (
-            <p className="mb-1 text-3xl text-center text-[#3673F5]">
-              Bug Machine
-            </p>
-          )} */}
             <Game
+              forceWithdrawal={forceWithdrawal}
               spin={spin}
               ring1={ring1}
               ring2={ring2}

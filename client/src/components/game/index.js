@@ -8,6 +8,7 @@ import { usePrivy } from "@privy-io/react-auth";
 import Link from "next/link";
 
 const Game = ({
+  forceWithdrawal,
   spin,
   ring1,
   ring2,
@@ -22,16 +23,10 @@ const Game = ({
 }) => {
   const { login } = usePrivy();
 
-  useEffect(() => {
-    const audioElement = document.getElementById("backgroundMusic");
-    if (!audioElement) return; // Return if audio element is not found
-
-    if (start) {
-      audioElement.play();
-    } else {
-      audioElement.pause();
-    }
-  }, [start]);
+  const handleLogin = () => {
+    console.log("login btn Clicked!");
+    login();
+  };
 
   return (
     <div>
@@ -54,12 +49,17 @@ const Game = ({
                 onClick={play}
                 disabled={start}
                 className="w-full mt-4 text-black">
-                Bet 100 Bugs
+                {start ? "Loading..." : "Bet 100 Bugs"}
               </Button>
-              <div className="col-span-2 mt-5 text-center">
+              <div className="grid grid-cols-2 text-xs mt-4 gap-4 col-span-2">
                 <Link href={"/mint"}>
                   <p className="underline">Mint Test Bugs</p>
                 </Link>
+                <p
+                  className="text-right cursor-pointer"
+                  onClick={forceWithdrawal}>
+                  Force withdrawal
+                </p>
               </div>
             </div>
           ) : (
@@ -69,18 +69,10 @@ const Game = ({
           )}
         </div>
       ) : (
-        <Button className="w-full mt-8 text-black" onClick={login}>
+        <Button className="w-full mt-8 text-black" onClick={handleLogin}>
           Connect
         </Button>
       )}
-      {/* Make sure to replace 'src' with the correct path to your audio file */}
-      <audio
-        id="backgroundMusic"
-        src="./final_tune.mp3"
-        className="w-0 h-0"
-        autoPlay
-        loop
-      />
     </div>
   );
 };
