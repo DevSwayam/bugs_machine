@@ -48,7 +48,7 @@ contract SlotMachine is ISlotMachine {
     address private s_BugsContractAddress;
 
     // Users in Queue waiting for there spin to get resolved
-    mapping(address => bool) private s_UserAddressToIsWaiting;
+    mapping(address => uint256) private s_UserAddressToLastTimestamp;
 
     // Bugs amount to bet
     uint256 private s_BettingBugsAmount = 100 * 10 ** 18;
@@ -177,11 +177,9 @@ contract SlotMachine is ISlotMachine {
         // transfer 100 bugs from user to this contract
         _bugs.transferFrom(_userAddress, address(this), s_BettingBugsAmount);
 
-        // set the mapping of users to their holding bugs in contract to 100 BUGS
-        s_UserAddressToBettedBugAmount[_userAddress] = s_BettingBugsAmount;
 
         // setIsWaiting true
-        s_UserAddressToIsWaiting[_userAddress] = true;
+        s_UserAddressToLastTimestamp[_userAddress] = block.timestamp;
 
         // Emit the betting event for users
         emit betPlaced(_userAddress, s_BettingBugsAmount);
@@ -210,7 +208,7 @@ contract SlotMachine is ISlotMachine {
         uint256 _uniqueId,
         address _userAddress
     ) external _onlyCallerContract {
-        if (s_UserAddressToIsWaiting[_userAddress] == false) {
+        if (s_UserAddressToLastTimestamp[_userAddress] == 0) {
             revert SlotMachine__UserDidntPutABet();
         }
 
@@ -225,16 +223,13 @@ contract SlotMachine is ISlotMachine {
     ) internal {
         uint8 _moduloResult = uint8(_randomNumber % 10);
         uint256 _bugsAmountWonByUser;
-        uint256 _bettedBugsAmount = s_UserAddressToBettedBugAmount[
-            _userAddress
-        ];
 
         if (_moduloResult == 0 || _moduloResult == 1) {
-            _bugsAmountWonByUser = _bettedBugsAmount * 2;
+            _bugsAmountWonByUser = s_BettingBugsAmount * 2;
         } else if (_moduloResult == 2) {
-            _bugsAmountWonByUser = (_bettedBugsAmount * 3) / 2;
+            _bugsAmountWonByUser = (s_BettingBugsAmount * 3) / 2;
         } else if (_moduloResult == 3 || _moduloResult == 4) {
-            _bugsAmountWonByUser = _bettedBugsAmount;
+            _bugsAmountWonByUser = s_BettingBugsAmount;
         } else {
             _bugsAmountWonByUser = 0;
         }
@@ -251,11 +246,9 @@ contract SlotMachine is ISlotMachine {
         // event(bettedAmount, winningAmount)
         emit betResolved(_userAddress, _bettedBugsAmount, _bugsAmountWonByUser);
 
-        // setIsWaiting to false
-        s_UserAddressToIsWaiting[_userAddress] = false;
+        // setting the last timestamp to 0
+        s_UserAddressToLastTimestamp[_userAddress] = 0;
 
-        // set s_UserAddressToBettedBugAmount to 0
-        s_UserAddressToBettedBugAmount[_userAddress] = 0;
     }
 
     function withdrawSlotMachineBugs(
@@ -285,6 +278,12 @@ contract SlotMachine is ISlotMachine {
             _withDrawAddress,
             _bugBalanceOfContract - s_InitialBugBalance
         );
+    }
+
+    function forceWithdrawlIfBridgeTransactionFails() external{
+        address _userAddress = msg.sender;
+        // check the last time stamp if its 0 then revert
+        // check if 1 hour has passed or not
     }
 
     /*//////////////////////////////////////////////////////////////

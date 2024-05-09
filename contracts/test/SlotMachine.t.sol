@@ -10,8 +10,8 @@ contract DeploySlotMachine is Test{
 
     SlotMachine _slotMachine; 
     BUGS _bugs; 
-    uint256 testPrivateKey;
-    address testPublicKey;
+    uint256 public testPrivateKey;
+    address public testPublicKey;
 
     function setUp() external {
         _slotMachine = SlotMachine(0x55df62A91801622B70026Aa8D0Ba3d1B8AaDEA7b);
@@ -34,7 +34,7 @@ contract DeploySlotMachine is Test{
     function testSlotMachineRevertWhenTriedCallingMorethanOneTime() public{
         testSlotMachineSpinning();
         vm.startBroadcast(testPrivateKey);
-        vm.expectRevert();
+        vm.expectRevert(SlotMachine.);
         _slotMachine.spinSlotMachine();
         vm.stopBroadcast();
     }
