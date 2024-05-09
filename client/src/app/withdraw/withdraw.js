@@ -2,10 +2,14 @@ import React, { useEffect, useState } from "react";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import bugsABI from "@/assets/bugsAbi.json";
 import { Contract, ethers } from "ethers";
 import { toast } from "sonner";
 import { usePrivy, useWallets } from "@privy-io/react-auth";
+import {
+  bugsABI,
+  bugsContractAddress,
+  slotMachineContractAddress,
+} from "@/addresses";
 
 const Withdraw = ({ withdrawAmmount, setWithdrawAmmount }) => {
   const { ready, user, login, logout, authenticated } = usePrivy();
@@ -23,16 +27,12 @@ const Withdraw = ({ withdrawAmmount, setWithdrawAmmount }) => {
 
     const signer = await provider?.getSigner();
 
-    const contractSM = new Contract(
-      "0x8ED8E66977541B6Ad412AA5CA7f21d21A7e565c1",
-      bugsABI,
-      signer
-    );
+    const contractSM = new Contract(bugsContractAddress, bugsABI, signer);
     const address = w0.address;
     try {
       const totalAllowance = await contractSM.allowance(
         address,
-        "0x55df62A91801622B70026Aa8D0Ba3d1B8AaDEA7b"
+        slotMachineContractAddress
         // price
       );
 
@@ -54,19 +54,12 @@ const Withdraw = ({ withdrawAmmount, setWithdrawAmmount }) => {
 
     const signer = await provider?.getSigner();
 
-    const contractSM = new Contract(
-      "0x8ED8E66977541B6Ad412AA5CA7f21d21A7e565c1",
-      bugsABI,
-      signer
-    );
+    const contractSM = new Contract(bugsContractAddress, bugsABI, signer);
 
     const price = ethers.utils.parseUnits(withdrawAmmount, "ether");
 
     try {
-      await contractSM.decreaseAllowance(
-        "0x55df62A91801622B70026Aa8D0Ba3d1B8AaDEA7b",
-        price
-      );
+      await contractSM.decreaseAllowance(slotMachineContractAddress, price);
     } catch (error) {
       toast("Error Occured!");
       // setSpin(false);
@@ -86,7 +79,7 @@ const Withdraw = ({ withdrawAmmount, setWithdrawAmmount }) => {
         />
         <p className="absolute top-2 right-4 text-[#3673F5]/60">$BUGS</p>
         <p className="text-right text-sm mt-3">
-          Available:{allowed.slice(0, -18)}
+          Available:{allowed === "0" ? "0" : allowed.slice(0, -18)}
         </p>
       </div>
 

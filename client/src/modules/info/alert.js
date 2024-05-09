@@ -18,7 +18,9 @@ export function AlertDialogComp() {
     <AlertDialog>
       <AlertDialogTrigger asChild>
         <div className="-mt-9 w-full flex justify-end">
-          <Info />
+          <div>
+            <Info />
+          </div>
         </div>
       </AlertDialogTrigger>
       <AlertDialogContent>
@@ -48,7 +50,7 @@ export function AlertDialogComp() {
         </AlertDialogHeader>
         <AlertDialogFooter>
           {/* <AlertDialogCancel>Cancel</AlertDialogCancel> */}
-          <AlertDialogAction className='w-full'>Understood!</AlertDialogAction>
+          <AlertDialogAction className="w-full">Understood!</AlertDialogAction>
         </AlertDialogFooter>
       </AlertDialogContent>
     </AlertDialog>

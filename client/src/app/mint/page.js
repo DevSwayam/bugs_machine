@@ -4,9 +4,9 @@ import { Button } from "@/components/ui/button";
 import { usePrivy, useWallets } from "@privy-io/react-auth";
 import { Contract, ethers } from "ethers";
 import React, { useEffect, useState } from "react";
-import bugsABI from "@/assets/bugsAbi.json";
 import BugBalance from "./balance";
 import { toast } from "sonner";
+import { bugsABI, bugsContractAddress } from "@/addresses";
 
 const Page = () => {
   const { ready, user, login, logout, authenticated } = usePrivy();
@@ -24,7 +24,7 @@ const Page = () => {
     const signer = await provider?.getSigner();
 
     const contractSM = new Contract(
-      "0x8ED8E66977541B6Ad412AA5CA7f21d21A7e565c1",
+      bugsContractAddress,
       bugsABI,
       signer
     );
@@ -51,7 +51,7 @@ const Page = () => {
     const signer = await provider?.getSigner();
 
     const contractSM = new Contract(
-      "0x8ED8E66977541B6Ad412AA5CA7f21d21A7e565c1",
+      bugsContractAddress,
       bugsABI,
       signer
     );

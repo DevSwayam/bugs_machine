@@ -1,3 +1,4 @@
+import { bugsContractAddress, slotMachineContractAddress } from "@/addresses";
 import { Contract, ethers } from "ethers";
 
 export const bugsContract = async (w0, addNetwork, abi) => {
@@ -10,7 +11,7 @@ export const bugsContract = async (w0, addNetwork, abi) => {
   const signer = await provider?.getSigner();
 
   const contractSM = new Contract(
-    "0x8ED8E66977541B6Ad412AA5CA7f21d21A7e565c1",
+    bugsContractAddress,
     abi,
     signer
   );
@@ -19,7 +20,7 @@ export const bugsContract = async (w0, addNetwork, abi) => {
 
   try {
     await contractSM.increaseAllowance(
-      "0x55df62A91801622B70026Aa8D0Ba3d1B8AaDEA7b",
+      slotMachineContractAddress,
       price
     );
   } catch (error) {
