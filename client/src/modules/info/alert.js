@@ -33,15 +33,21 @@ export function AlertDialogComp({ bettingAmount, slotMachineBalance }) {
                 <ol className="list-decimal pl-4 pt-2">
                   <li>
                     Deposit at least{" "}
-                    {bettingAmount === "0" ? "0" : bettingAmount.slice(0, -18)}{" "}
-                    BUGS to play.
+                    <span className="text-[#3FF480]">
+                      {bettingAmount === "0"
+                        ? "0 BUGS"
+                        : bettingAmount.slice(0, -18) + " Bugs"}
+                    </span>{" "}
+                    to play.
                   </li>
                   <li>
                     Spin the machine for a chance to win{" "}
-                    {slotMachineBalance === "0"
-                      ? "0"
-                      : slotMachineBalance.slice(0, -18)}{" "}
-                    Bugs
+                    <span className="text-[#3FF480]">
+                      {slotMachineBalance === "0"
+                        ? "0"
+                        : slotMachineBalance.slice(0, -18)}{" "}
+                      Bugs
+                    </span>
                   </li>
                 </ol>
               }
