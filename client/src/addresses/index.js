@@ -6,6 +6,6 @@ export const SlotMachineABI = SlotMachineABIJSON;
 export const bugsABI = bugsABIJSON;
 
 export const slotMachineContractAddress =
-  "0xbc5dd25aB5b581D631182aa775902278E9566695";
+  "0x93FE22cE682cac26EE6DE869ECA57C61683acD5C";
 
-export const bugsContractAddress = "0x70EA9271f7092a9E014FD03e9DF1dDc741268Cc3";
+export const bugsContractAddress = "0x6B29C8D2f1E3497E276B6eA9D8F76d10d99f33ca";

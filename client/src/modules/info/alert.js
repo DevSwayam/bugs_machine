@@ -13,13 +13,13 @@ import {
 import { Button } from "@/components/ui/button";
 import { Info } from "lucide-react";
 
-export function AlertDialogComp() {
+export function AlertDialogComp({ bettingAmount, slotMachineBalance }) {
   return (
     <AlertDialog>
       <AlertDialogTrigger asChild>
         <div className="-mt-9 w-full flex justify-end">
           <div>
-            <Info />
+            <Info className="text-[#3FF480] cursor-pointer" />
           </div>
         </div>
       </AlertDialogTrigger>
@@ -31,18 +31,18 @@ export function AlertDialogComp() {
               note={<p>Instructions</p>}
               desc={
                 <ol className="list-decimal pl-4 pt-2">
-                  <li>Deposit at least 100 BUGS to play.</li>
-                  <li>Spin the machine for a chance to win big:</li>
-                  <ul className="list-disc pl-4 pt-2">
-                    <li>20%: Double your bet </li>
-                    <li>10%: Get 1.5x your bet</li>
-                    <li>20%: Get your bet back</li>
-                    <li>
-                      50%: Lose your bet If the machine malfunctions, refresh
-                      and try again force withdrawal of bugs after one hour .
-                      Good luck!
-                    </li>
-                  </ul>
+                  <li>
+                    Deposit at least{" "}
+                    {bettingAmount === "0" ? "0" : bettingAmount.slice(0, -18)}{" "}
+                    BUGS to play.
+                  </li>
+                  <li>
+                    Spin the machine for a chance to win{" "}
+                    {slotMachineBalance === "0"
+                      ? "0"
+                      : slotMachineBalance.slice(0, -18)}{" "}
+                    Bugs
+                  </li>
                 </ol>
               }
             />

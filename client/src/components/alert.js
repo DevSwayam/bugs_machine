@@ -41,9 +41,16 @@ const SpringModal = ({ isOpen, setIsOpen, wonPrize }) => {
               {/* <div className="bg-white w-16 h-16 mb-2 rounded-full text-3xl text-gray-800 grid place-items-center mx-auto">
                 <FiAlertCircle />
               </div> */}
-              <h3 className="text-2xl font-bold text-center mb-2">
-                You&apos;ve won {wonPrize === "0" ? "0" : wonPrize.slice(0, -18)} Bugs
-              </h3>
+              {wonPrize === "0" ? (
+                <h3 className="text-2xl font-bold text-center mb-2">
+                  Better luck next time!!
+                </h3>
+              ) : (
+                <h3 className="text-2xl font-bold text-center mb-2">
+                  You&apos;ve won{" "}
+                  {wonPrize.slice(0, -18)} Bugs
+                </h3>
+              )}
 
               <div className="flex gap-2">
                 <button

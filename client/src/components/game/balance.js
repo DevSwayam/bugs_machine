@@ -4,7 +4,13 @@ import Link from "next/link";
 import { Info } from "lucide-react";
 import { AlertDialogComp } from "@/modules/info/alert";
 
-const Balance = ({ allowed, setAllowed, bugBalance }) => {
+const Balance = ({
+  allowed,
+  setAllowed,
+  bugBalance,
+  bettingAmount,
+  slotMachineBalance,
+}) => {
   // const { address } = account;
   const [balanceData, setBalanceData] = useState(0);
 
@@ -13,7 +19,10 @@ const Balance = ({ allowed, setAllowed, bugBalance }) => {
   }, []);
   return (
     <div className="w-full flex gap-2 flex-col justify-between items-center text-[#BCD0FC]">
-      <AlertDialogComp />
+      <AlertDialogComp
+        bettingAmount={bettingAmount}
+        slotMachineBalance={slotMachineBalance}
+      />
 
       <div className="w-full flex">
         <div className="flex justify-between w-full">
