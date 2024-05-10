@@ -8,6 +8,7 @@ import { usePrivy } from "@privy-io/react-auth";
 import Link from "next/link";
 
 const Game = ({
+  bettingAmount,
   forceWithdrawal,
   spin,
   ring1,
@@ -49,7 +50,11 @@ const Game = ({
                 onClick={play}
                 disabled={start}
                 className="w-full mt-4 text-black">
-                {start ? "Loading..." : "Bet 100 Bugs"}
+                {start
+                  ? "Loading..."
+                  : `Bet ${
+                      bettingAmount === "0" ? "0" : bettingAmount.slice(0, -18)
+                    } Bugs`}
               </Button>
               <div className="grid grid-cols-2 text-xs mt-4 gap-4 col-span-2">
                 <Link href={"/mint"}>

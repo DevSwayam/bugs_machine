@@ -8,7 +8,12 @@ import { Contract, ethers } from "ethers";
 import { toast } from "sonner";
 import axios from "axios";
 import AlertModal from "@/components/alert";
-import { SlotMachineABI, bugsABI, bugsContractAddress, slotMachineContractAddress } from "@/addresses";
+import {
+  SlotMachineABI,
+  bugsABI,
+  bugsContractAddress,
+  slotMachineContractAddress,
+} from "@/addresses";
 // import { bugsContract } from "@/contracts/bugs";
 
 const App = () => {
@@ -34,6 +39,8 @@ const App = () => {
   const [bugBalance, setBugBalance] = useState("0");
   const [start, setStart] = useState(false);
   const backendAPI = process.env.backendAPI;
+  const [bettingAmount, setBettingAmount] = useState("0");
+  const [slotMachineBalance, setSlotMachineBalance] = useState("0");
 
   useEffect(() => {
     if (start) {
@@ -131,7 +138,7 @@ const App = () => {
       const totalAllowance = await contractSM.allowance(
         address,
         slotMachineContractAddress
-        
+
         // price
       );
 
@@ -143,10 +150,51 @@ const App = () => {
       // setSpin(false);
     }
   };
+
+  const getBettingAmount = async () => {
+    const provider = await w0?.getEthersProvider();
+    const signer = await provider?.getSigner();
+
+    const contractSM = new Contract(
+      slotMachineContractAddress,
+      SlotMachineABI,
+      signer
+    );
+
+    try {
+      const betting_Amount = await contractSM.getCurrentBettingAmount();
+      const bigNumber = ethers.BigNumber.from(betting_Amount);
+      console.log(bigNumber);
+      setBettingAmount(bigNumber.toString());
+    } catch (error) {
+      console.log(error);
+      toast("Error Occured!");
+    }
+  };
+
+  const getSlotmachineBalance = async () => {
+    const provider = await w0?.getEthersProvider();
+    const signer = await provider?.getSigner();
+
+    const contractSM = new Contract(bugsContractAddress, bugsABI, signer);
+
+    try {
+      const slotMachine_balance = await contractSM.balanceOf(
+        slotMachineContractAddress
+      );
+      const bigNumber = ethers.BigNumber.from(slotMachine_balance);
+      setSlotMachineBalance(bigNumber.toString());
+    } catch (error) {
+      console.log(error);
+      toast("Error Occured!");
+    }
+  };
   useEffect(() => {
     if (ready && authenticated && w0?.address !== undefined) {
       checkAllowance();
       getBugBalance();
+      getBettingAmount();
+      getSlotmachineBalance();
     }
   }, [w0]);
 
@@ -240,9 +288,11 @@ const App = () => {
 
           <div className="col-span-2">
             <Balance
+              slotMachineBalance={slotMachineBalance}
               allowed={allowed}
               setAllowed={setAllowed}
               bugBalance={bugBalance}
+              bettingAmount={bettingAmount}
             />
           </div>
 
@@ -260,6 +310,7 @@ const App = () => {
               betAmmount={betAmmount}
               setBetAmmount={setBetAmmount}
               start={start}
+              bettingAmount={bettingAmount}
             />
           </div>
         </div>
