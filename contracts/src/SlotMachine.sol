@@ -47,17 +47,18 @@ contract SlotMachine is ISlotMachine {
     // ERC20 Contract Address for BUGS
     address private s_BugsContractAddress;
 
-    // Users in Queue waiting for there spin to get resolved
+    // Mapping of user addresses to the timestamp of their last spin resolution
+    // Used to track users waiting for their spins to be resolved
     mapping(address => uint256) private s_UserAddressToLastTimestamp;
 
+    // Mapping of user addresses to the amount of bugs betted by each user
     mapping(address => uint256) private s_UserAddressToBettedBugAmount;
 
     // The minimum amount of bugs the contract should have to be playable
     uint256[3] private s_BugBettingTiers = [1000 ether, 2000 ether, 5000 ether];
-    uint256[3] private s_BugBettingTierFees = [5 ether, 10 ether, 15 ether];
 
-    // test variable
-    uint256 public randomNumber;
+    // The betting amount according to tiers of machine
+    uint256[3] private s_BugBettingTierFees = [5 ether, 10 ether, 15 ether];
 
     /*//////////////////////////////////////////////////////////////
                                  EVENTS
@@ -156,15 +157,10 @@ contract SlotMachine is ISlotMachine {
         s_IsInitialised = true;
     }
 
-
-    
-
     function spinSlotMachine() external _onlyOnce _isPlayable {
         address _userAddress = msg.sender;
-
         IERC20 _bugs = IERC20(s_BugsContractAddress);
 
-        // check the balance of user from bugs contract if not sufficient revert
         uint256 _userBugsBalance = _bugs.balanceOf(_userAddress);
 
         uint256 _currentBettingAmount = getCurrentBettingAmount();
@@ -173,7 +169,6 @@ contract SlotMachine is ISlotMachine {
             revert SlotMachine__NotEnoughBugsAmount();
         }
 
-        // check the whether the contract has enough approval if not revert
         uint256 _userTotalApproval = _bugs.allowance(
             _userAddress,
             address(this)
@@ -183,16 +178,12 @@ contract SlotMachine is ISlotMachine {
             revert SlotMachine__UserApprovalAmountIsNotSufficient();
         }
 
-        // transfer 100 bugs from user to this contract
         _bugs.transferFrom(_userAddress, address(this), _currentBettingAmount);
 
-        // setUserAddressToLastTimeStamp
         s_UserAddressToLastTimestamp[_userAddress] = block.timestamp;
 
-        // Store the last bug amount in mapping will be used for force withdrawl
         s_UserAddressToBettedBugAmount[_userAddress] = _currentBettingAmount;
 
-        // Emit the betting event for users
         emit betPlaced(_userAddress, _currentBettingAmount);
     }
 
@@ -202,6 +193,9 @@ contract SlotMachine is ISlotMachine {
         address _userAddress
     ) external _onlyCallerContract {
         if (s_UserAddressToLastTimestamp[_userAddress] == 0) {
+            revert SlotMachine__UserDidntPutABet();
+        }
+        if (s_UserAddressToBettedBugAmount[_userAddress] == 0) {
             revert SlotMachine__UserDidntPutABet();
         }
 
@@ -216,20 +210,22 @@ contract SlotMachine is ISlotMachine {
         uint256 _userBettedBugAmount = s_UserAddressToBettedBugAmount[
             _userAddress
         ];
-        uint256 _bugsAmountWonByUser = 0 ;
-        uint256 _moduloResult;
+
+        uint256 _bugsAmountWonByUser = 0;
+        uint256 _moduloResult = 0;
+
         if (_userBettedBugAmount == s_BugBettingTierFees[0]) {
             _moduloResult = _randomNumber % 10000;
         } else {
             _moduloResult = _randomNumber % 100000;
         }
+
         if (_moduloResult == 9999) {
             _bugsAmountWonByUser = IERC20(s_BugsContractAddress).balanceOf(
                 address(this)
             );
         }
 
-        // according to the random number the winning amount for user will be decided
         if (_bugsAmountWonByUser > 0) {
             IERC20(s_BugsContractAddress).transfer(
                 _userAddress,
@@ -237,17 +233,14 @@ contract SlotMachine is ISlotMachine {
             );
         }
 
-        // event(bettedAmount, winningAmount)
         emit betResolved(
             _userAddress,
             _userBettedBugAmount,
             _bugsAmountWonByUser
         );
 
-        // setting the last timestamp to 0
         s_UserAddressToLastTimestamp[_userAddress] = 0;
         s_UserAddressToBettedBugAmount[_userAddress] = 0;
-        randomNumber = _randomNumber;
     }
 
     function withdrawSlotMachineBugs(address _withDrawAddress)
@@ -277,7 +270,7 @@ contract SlotMachine is ISlotMachine {
             _userAddress
         ];
 
-        if (_userBettedBugAmount < 0) {
+        if (_userBettedBugAmount == 0) {
             revert SlotMachine__UserNotInQueue();
         }
 
@@ -321,7 +314,7 @@ contract SlotMachine is ISlotMachine {
         }
     }
 
-    function isEligibleForForceWithdrawl() external view returns (bool) {
+    function getIsEligibleForForceWithdrawl() external view returns (bool) {
         uint256 _userLastTimeStamp = s_UserAddressToLastTimestamp[msg.sender];
         if (block.timestamp - _userLastTimeStamp < 3600) {
             return false;
@@ -329,11 +322,11 @@ contract SlotMachine is ISlotMachine {
             return true;
         }
     }
-        function getCurrentBettingAmount() public view returns (uint256) {
+
+    function getCurrentBettingAmount() public view returns (uint256) {
         uint256 _currentBanalceOfBugs = IERC20(s_BugsContractAddress).balanceOf(
             address(this)
         );
-
         if (
             _currentBanalceOfBugs >= s_BugBettingTiers[0] &&
             _currentBanalceOfBugs < s_BugBettingTiers[1]
@@ -347,5 +340,9 @@ contract SlotMachine is ISlotMachine {
         } else {
             return s_BugBettingTierFees[2];
         }
+    }
+
+    function getCurrentWinningAmount() external view returns (uint256) {
+        return (IERC20(s_BugsContractAddress).balanceOf(address(this)));
     }
 }
