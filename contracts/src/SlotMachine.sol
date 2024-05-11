@@ -2,7 +2,7 @@
 
 pragma solidity >=0.8.2 <0.9.0;
 
-import {IERC20} from "../lib/openzeppelin-contracts/contracts/interfaces/IERC20.sol";
+import {IERC20} from "https://github.com/OpenZeppelin/openzeppelin-contracts/blob/release-v4.9/contracts/interfaces/IERC20.sol";
 
 /*//////////////////////////////////////////////////////////////
                             INTERFACE
@@ -50,11 +50,14 @@ contract SlotMachine is ISlotMachine {
     // Users in Queue waiting for there spin to get resolved
     mapping(address => uint256) private s_UserAddressToLastTimestamp;
 
-    // Bugs amount to bet
-    uint256 private s_BettingBugsAmount = 100 * 10**18;
+    mapping(address => uint256) private s_UserAddressToBettedBugAmount;
 
     // The minimum amount of bugs the contract should have to be playable
-    uint256 private s_InitialBugBalance = 500 * 10**18;
+    uint256[3] private s_BugBettingTiers = [1000 ether, 2000 ether, 5000 ether];
+    uint256[3] private s_BugBettingTierFees = [5 ether, 10 ether, 15 ether];
+
+    // test variable
+    uint256 public randomNumber;
 
     /*//////////////////////////////////////////////////////////////
                                  EVENTS
@@ -118,7 +121,7 @@ contract SlotMachine is ISlotMachine {
         uint256 _bugBalanceOfContract = IERC20(s_BugsContractAddress).balanceOf(
             address(this)
         );
-        if (_bugBalanceOfContract < s_InitialBugBalance) {
+        if (_bugBalanceOfContract < s_BugBettingTiers[0]) {
             revert SlotMachine__DoesNotHaveEnoughBugsToPlay();
         }
         _;
@@ -153,6 +156,9 @@ contract SlotMachine is ISlotMachine {
         s_IsInitialised = true;
     }
 
+
+    
+
     function spinSlotMachine() external _onlyOnce _isPlayable {
         address _userAddress = msg.sender;
 
@@ -161,7 +167,9 @@ contract SlotMachine is ISlotMachine {
         // check the balance of user from bugs contract if not sufficient revert
         uint256 _userBugsBalance = _bugs.balanceOf(_userAddress);
 
-        if (_userBugsBalance < s_BettingBugsAmount) {
+        uint256 _currentBettingAmount = getCurrentBettingAmount();
+
+        if (_userBugsBalance < _currentBettingAmount) {
             revert SlotMachine__NotEnoughBugsAmount();
         }
 
@@ -171,43 +179,21 @@ contract SlotMachine is ISlotMachine {
             address(this)
         );
 
-        if (_userTotalApproval < s_BettingBugsAmount) {
+        if (_userTotalApproval < _currentBettingAmount) {
             revert SlotMachine__UserApprovalAmountIsNotSufficient();
         }
 
         // transfer 100 bugs from user to this contract
-        _bugs.transferFrom(_userAddress, address(this), s_BettingBugsAmount);
+        _bugs.transferFrom(_userAddress, address(this), _currentBettingAmount);
 
         // setUserAddressToLastTimeStamp
         s_UserAddressToLastTimestamp[_userAddress] = block.timestamp;
 
+        // Store the last bug amount in mapping will be used for force withdrawl
+        s_UserAddressToBettedBugAmount[_userAddress] = _currentBettingAmount;
+
         // Emit the betting event for users
-        emit betPlaced(_userAddress, s_BettingBugsAmount);
-    }
-
-    function updateBettingBugsAmount(uint256 _newBettingBugAmount)
-        external
-        _onlyOwner
-    {
-        s_BettingBugsAmount = _newBettingBugAmount;
-    }
-
-    function updateCallerContract(address _newCallerContractAddress)
-        external
-        _onlyOwner
-    {
-        s_CallerContract = _newCallerContractAddress;
-    }
-
-    function updateBugsContract(address _newBugsContractAddress)
-        external
-        _onlyOwner
-    {
-        s_BugsContractAddress = _newBugsContractAddress;
-    }
-
-    function updateOwnerOfSlotMachine(address _newOwner) external _onlyOwner{
-        i_Owner = _newOwner;
+        emit betPlaced(_userAddress, _currentBettingAmount);
     }
 
     function handle(
@@ -227,17 +213,20 @@ contract SlotMachine is ISlotMachine {
     function resolveWinner(address _userAddress, uint16 _randomNumber)
         internal
     {
-        uint16 _moduloResult = _randomNumber % 10;
-        uint256 _bugsAmountWonByUser;
-
-        if (_moduloResult == 0 || _moduloResult == 1) {
-            _bugsAmountWonByUser = s_BettingBugsAmount * 2;
-        } else if (_moduloResult == 2) {
-            _bugsAmountWonByUser = (s_BettingBugsAmount * 3) / 2;
-        } else if (_moduloResult == 3 || _moduloResult == 4) {
-            _bugsAmountWonByUser = s_BettingBugsAmount;
+        uint256 _userBettedBugAmount = s_UserAddressToBettedBugAmount[
+            _userAddress
+        ];
+        uint256 _bugsAmountWonByUser = 0 ;
+        uint256 _moduloResult;
+        if (_userBettedBugAmount == s_BugBettingTierFees[0]) {
+            _moduloResult = _randomNumber % 10000;
         } else {
-            _bugsAmountWonByUser = 0;
+            _moduloResult = _randomNumber % 100000;
+        }
+        if (_moduloResult == 9999) {
+            _bugsAmountWonByUser = IERC20(s_BugsContractAddress).balanceOf(
+                address(this)
+            );
         }
 
         // according to the random number the winning amount for user will be decided
@@ -251,12 +240,14 @@ contract SlotMachine is ISlotMachine {
         // event(bettedAmount, winningAmount)
         emit betResolved(
             _userAddress,
-            s_BettingBugsAmount,
+            _userBettedBugAmount,
             _bugsAmountWonByUser
         );
 
         // setting the last timestamp to 0
         s_UserAddressToLastTimestamp[_userAddress] = 0;
+        s_UserAddressToBettedBugAmount[_userAddress] = 0;
+        randomNumber = _randomNumber;
     }
 
     function withdrawSlotMachineBugs(address _withDrawAddress)
@@ -268,27 +259,7 @@ contract SlotMachine is ISlotMachine {
         if (_bugBalanceOfContract == 0) {
             revert SlotMachine__DoesNotHaveEnoughBugsToWithDraw();
         }
-        _bugs.transfer(
-            _withDrawAddress,
-            _bugBalanceOfContract
-        );
-    }
-
-    function withdrawSlotMachineProfit(address _withDrawAddress)
-        external
-        _onlyOwner
-    {
-        IERC20 _bugs = IERC20(s_BugsContractAddress);
-        uint256 _bugBalanceOfContract = _bugs.balanceOf(address(this));
-
-        if (_bugBalanceOfContract < s_InitialBugBalance * 2) {
-            revert SlotMachine__DoesNotHaveEnoughBugsToWithDraw();
-        }
-
-        _bugs.transfer(
-            _withDrawAddress,
-            _bugBalanceOfContract - s_InitialBugBalance * 2
-        );
+        _bugs.transfer(_withDrawAddress, _bugBalanceOfContract);
     }
 
     function forceWithdrawlIfBridgeTransactionFails() external {
@@ -302,10 +273,19 @@ contract SlotMachine is ISlotMachine {
             revert SlotMachine__UserNotInQueue();
         }
 
+        uint256 _userBettedBugAmount = s_UserAddressToBettedBugAmount[
+            _userAddress
+        ];
+
+        if (_userBettedBugAmount < 0) {
+            revert SlotMachine__UserNotInQueue();
+        }
+
         IERC20(s_BugsContractAddress).transfer(
             _userAddress,
-            s_BettingBugsAmount
+            _userBettedBugAmount
         );
+        s_UserAddressToBettedBugAmount[_userAddress] = 0;
         s_UserAddressToLastTimestamp[_userAddress] = 0;
     }
 
@@ -341,27 +321,31 @@ contract SlotMachine is ISlotMachine {
         }
     }
 
-    function getBettingBugsAmount() external view returns (uint256) {
-        return s_BettingBugsAmount;
-    }
-
-    function totalProfitForSlotMachine() external view returns (uint256) {
-        IERC20 _bugs = IERC20(s_BugsContractAddress);
-        uint256 _bugBalanceOfContract = _bugs.balanceOf(address(this));
-       
-        if(_bugBalanceOfContract > s_InitialBugBalance * 2){
-            return  _bugBalanceOfContract - s_InitialBugBalance * 2;
-        }else{
-            return 0;
-        }
-    }
-
     function isEligibleForForceWithdrawl() external view returns (bool) {
         uint256 _userLastTimeStamp = s_UserAddressToLastTimestamp[msg.sender];
         if (block.timestamp - _userLastTimeStamp < 3600) {
             return false;
         } else {
             return true;
+        }
+    }
+        function getCurrentBettingAmount() public view returns (uint256) {
+        uint256 _currentBanalceOfBugs = IERC20(s_BugsContractAddress).balanceOf(
+            address(this)
+        );
+
+        if (
+            _currentBanalceOfBugs >= s_BugBettingTiers[0] &&
+            _currentBanalceOfBugs < s_BugBettingTiers[1]
+        ) {
+            return s_BugBettingTierFees[0];
+        } else if (
+            _currentBanalceOfBugs >= s_BugBettingTiers[1] &&
+            _currentBanalceOfBugs < s_BugBettingTiers[2]
+        ) {
+            return s_BugBettingTierFees[1];
+        } else {
+            return s_BugBettingTierFees[2];
         }
     }
 }
