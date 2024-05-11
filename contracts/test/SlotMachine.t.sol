@@ -34,7 +34,7 @@ contract DeploySlotMachine is Test{
     function testSlotMachineRevertWhenTriedCallingMorethanOneTime() public{
         testSlotMachineSpinning();
         vm.startBroadcast(testPrivateKey);
-        vm.expectRevert(SlotMachine.);
+        vm.expectRevert();
         _slotMachine.spinSlotMachine();
         vm.stopBroadcast();
     }
