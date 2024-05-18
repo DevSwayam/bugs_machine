@@ -25,6 +25,19 @@ export function BridgeAccordian({ w0 }) {
   return (
     <Accordion type="single" collapsible className="w-full">
       {isBugsLocked && <PlayGamePopup isOpen={isBugsLocked} />}
+      <AccordionItem value="item-3">
+        <AccordionTrigger>Mint Test Bugs</AccordionTrigger>
+        <AccordionContent className="bg-secondary p-2">
+          <div>
+            <p>You can mint 1000 test bugs to play</p>
+            <Button
+              className="bg-[#3673F5] hover:bg-[#3673F5]/60 mt-2 w-full"
+              onClick={() => mintBugs(w0)}>
+              Mint Bugs
+            </Button>
+          </div>
+        </AccordionContent>
+      </AccordionItem>
       <AccordionItem value="item-1">
         <AccordionTrigger> Bridge Bugs</AccordionTrigger>
         <AccordionContent className="bg-secondary p-2">
@@ -74,19 +87,7 @@ export function BridgeAccordian({ w0 }) {
           </div>
         </AccordionContent>
       </AccordionItem>
-      <AccordionItem value="item-3">
-        <AccordionTrigger>Mint Test Bugs</AccordionTrigger>
-        <AccordionContent className="bg-secondary p-2">
-          <div>
-            <p>You can mint test bugs to play</p>
-            <Button
-              className="bg-[#3673F5] hover:bg-[#3673F5]/60 mt-2 w-full"
-              onClick={() => mintBugs(w0)}>
-              Mint Bugs
-            </Button>
-          </div>
-        </AccordionContent>
-      </AccordionItem>
+
       {/* <AccordionItem value="item-3">
         <AccordionTrigger>Is it animated?</AccordionTrigger>
         <AccordionContent>

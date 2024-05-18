@@ -18,21 +18,19 @@ const Hero = () => {
               <div className="flex items-center justify-center ">
                 <Badge
                   className={
-                    "bg-secondary hover:bg-muted text-sm flex justify-between gap-3 text-muted-foreground"
+                    "bg-secondary hover:bg-muted text-md flex justify-between gap-3 text-foreground"
                   }>
-                  <p>🎉</p>
-                  <p>Connect Seamlessly, Chat Effortlessly.</p>
+                  <p>🎮</p>
+                  <p>Spin, Win, Earn, Repeat.</p>
                 </Badge>
               </div>
               <div className="flex flex-col items-center gap-4">
-                <h1 className="scroll-m-20 text-4xl font-extrabold tracking-tight lg:text-6xl text-center">
-                  {/* <span className="bg-green-400">TextHub</span> */}Chat
-                  Beyond Boundaries.
+                <h1 className="scroll-m-20 text-4xl font-extrabold tracking-tight lg:text text-center">
+                  {/* <span className="bg-green-400">TextHub</span> */}Bloody Bugs Battle
                   {/* <br className="hidden sm:inline" /> */}
                 </h1>
                 <p className="max-w-[700px] text-lg text-muted-foreground text-center">
-                  Where every word sparks a conversation. Join our chatting app
-                  and dive into limitless connections, one message at a time.
+                Join the Decentralized Thrill of the Slot Machine Game on Inco Network! Fairness Guaranteed, Jackpots Growing!
                 </p>
                 <div className="flex justify-center items-center gap-3">
                   <Link href={"/bridge"}>

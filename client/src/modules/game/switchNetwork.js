@@ -18,10 +18,9 @@ export function SwitchNetwork({ isOpen, w0, setNetworkName, func }) {
     <AlertDialog open={isOpen}>
       <AlertDialogContent>
         <AlertDialogHeader>
-          <AlertDialogTitle>Are you absolutely sure?</AlertDialogTitle>
+          <AlertDialogTitle>Chain Switch Required</AlertDialogTitle>
           <AlertDialogDescription>
-            This action cannot be undone. This will permanently delete your
-            account and remove your data from our servers.
+          To deposit Bugs in the slot machine or to play the game you need to switch Network.
           </AlertDialogDescription>
         </AlertDialogHeader>
         <AlertDialogFooter>
