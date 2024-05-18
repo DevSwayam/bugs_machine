@@ -1,5 +1,7 @@
 ### Slot Machine Game Information Document
 
+<a href="https://www.loom.com/share/04dd6d0a33da470986bc136882a31846?sid=2a9ab5fc-9c30-40d0-af98-aac348d1ea45" target="_blank">Demo Link to Understand</a>
+
 #### Overview
 The Slot Machine Game is a decentralized on-chain game that leverages the Inco network to generate random numbers in a secure and transparent manner. The game is deployed on the Red Stone platform and utilizes Hyperlane infrastructure to bridge users' tokens from Red Stone to Inco. The randomness of the game ensures fairness, as even the game developers do not know the winning number. As players participate, the number of Bugs (in-game tokens) locked in the smart contract increases, boosting the jackpot rewards.
 
