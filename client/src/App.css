@@ -1,0 +1,59 @@
+@keyframes goaround {
+  0% {
+    transform: translateY(0);
+  }
+  100% {
+    transform: translateY(-100%);
+  }
+}
+
+@keyframes stop {
+  0% {
+    transform: translateY(-100%);
+  }
+  50% {
+    transform: translateY(-50%);
+  }
+  100% {
+    transform: translateY(0);
+  }
+}
+
+.ringMoving1 {
+  height: 125px;
+  width: 125px;
+  line-height: 200px;
+  text-align: center;
+  font-size: 4em;
+  animation: goaround 0.2s linear infinite;
+}
+
+.ringMoving2 {
+  height: 125px;
+  width: 125px;
+  line-height: 200px;
+  text-align: center;
+  font-size: 4em;
+  animation: goaround 0.3s linear infinite;
+}
+
+.ringMoving3 {
+  height: 125px;
+  width: 125px;
+  line-height: 200px;
+  text-align: center;
+  font-size: 4em;
+  animation: goaround 0.35s linear infinite;
+}
+
+.spinAnimation {
+  animation-name: goaround;
+  animation-duration: 1s;
+  animation-timing-function: ease-in-out; /* Smooth transition */
+}
+
+.stopAnimation {
+  animation-name: stop;
+  animation-duration: 0.5s;
+  animation-timing-function: ease-in-out; /* Smooth transition */
+}
