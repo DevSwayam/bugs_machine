@@ -5,12 +5,12 @@ import axios from "axios";
 const backendAPI = process.env.backendAPI;
 
 export const checkUserBalance = async (w0, setUserBalance, setStart,setIsNoBalancePopUp) => {
-  const provider = await w0?.getEthersProvider();
-  const signer = await provider?.getSigner();
+  const rpcUrl = "https://testnet.inco.org";
+  const provider = new ethers.providers.JsonRpcProvider(rpcUrl);
   const contractSM = new Contract(
     slotMachineContractAddress,
     SlotMachineABI,
-    signer
+    provider
   );
   const address = w0.address;
   try {
@@ -30,12 +30,12 @@ export const checkUserBalance = async (w0, setUserBalance, setStart,setIsNoBalan
 };
 
 export const checkSlotMachineBalance = async (w0, setJackpot, setStart) => {
-  const provider = await w0?.getEthersProvider();
-  const signer = await provider?.getSigner();
+  const rpcUrl = "https://testnet.inco.org";
+  const provider = new ethers.providers.JsonRpcProvider(rpcUrl);
   const contractSM = new Contract(
     slotMachineContractAddress,
     SlotMachineABI,
-    signer
+    provider
   );
   try {
     const jackpotPts = await contractSM.s_SlotMachineBalance();
@@ -51,12 +51,12 @@ export const checkSlotMachineBalance = async (w0, setJackpot, setStart) => {
 };
 
 export const checkBettingAmmount = async (w0, setBettingAmount, setStart) => {
-  const provider = await w0?.getEthersProvider();
-  const signer = await provider?.getSigner();
+  const rpcUrl = "https://testnet.inco.org";
+  const provider = new ethers.providers.JsonRpcProvider(rpcUrl);
   const contractSM = new Contract(
     slotMachineContractAddress,
     SlotMachineABI,
-    signer
+    provider
   );
   try {
     const btngAmount = await contractSM.s_SpinCharge();
@@ -108,7 +108,7 @@ export const signMessage = async (
   const domain = {
     name: "SlotMachine",
     version: "1",
-    chainId: await signer.getChainId(),
+    chainId: "17001",
     verifyingContract: slotMachineContractAddress,
   };
 
@@ -116,12 +116,16 @@ export const signMessage = async (
     Spin: [
       { name: "user", type: "address" },
       { name: "expiration", type: "uint256" },
+      { name: "chainId", type: "uint256" },
+      { name: "executionChainId", type: "uint256" },
     ],
   };
 
   const value = {
     user: address,
     expiration: expirationTime,
+    chainId: 9090, // Inco chain ID
+    executionChainId: 17001, // RedStone chain ID
   };
 
   try {
@@ -142,12 +146,12 @@ export const signMessage = async (
   }
 };
 const eventListener = async (w0, setisWinner, setStart, setValue, setPopup) => {
-  const provider = await w0?.getEthersProvider();
-  const signer = await provider?.getSigner();
+  const rpcUrl = "https://testnet.inco.org";
+  const provider = new ethers.providers.JsonRpcProvider(rpcUrl);
   const contractSM = new Contract(
     slotMachineContractAddress,
     SlotMachineABI,
-    signer
+    provider
   );
   try {
     let count = 0;

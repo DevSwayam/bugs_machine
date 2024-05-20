@@ -34,7 +34,7 @@ app.post('/api/eip712call/:address', async (req, res) => {
         const signer = wallet.connect(provider);
         const contract = new ethers.Contract(contract_Address, contract_Abi, signer);
 
-        const result = await contract.spinSlotMachine(userAddress, expiryTime, bytesSignature);
+        const result = await contract.spinSlotMachine(userAddress, expiryTime,9090,17001, bytesSignature);
         res.json(result);
         console.log(result);
     } catch (error) {

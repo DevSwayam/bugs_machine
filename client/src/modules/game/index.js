@@ -24,7 +24,6 @@ const Index = () => {
   const router = useRouter();
   const { wallets } = useWallets();
   const w0 = wallets[0];
-  const [networkName, setNetworkName] = useState("");
   const [spin, setSpin] = useState(false);
   const [ring1, setRing1] = useState();
   const [ring2, setRing2] = useState();
@@ -81,8 +80,7 @@ const Index = () => {
 
   useEffect(() => {
     if (ready && authenticated && w0?.address !== undefined) {
-      if (w0.chainId === "eip155:9090" && ready) {
-        setNetworkName(chainsName.inco);
+      if ( ready) {
         checkUserBalance(w0, setUserBalance, setStart,setIsNoBalancePopUp);
         checkSlotMachineBalance(w0, setJackpot, setStart);
         checkBettingAmmount(w0, setBettingAmount, setStart);
@@ -98,17 +96,7 @@ const Index = () => {
 
   if (!ready) return <Lottie animationData={LoadingAnimation} loop={true} />;
 
-  if (networkName !== chainsName.inco && authenticated)
-    return (
-      <SwitchNetwork
-        isOpen={true}
-        func={switchToIncoNetwork}
-        w0={w0}
-        setNetworkName={setNetworkName}
-      />
-    );
-
-  if (networkName === chainsName.inco && ready && authenticated)
+  if (ready && authenticated)
     return (
       <div className="min-h-screen flex flex-col items-center justify-center">
         <AlertModal
