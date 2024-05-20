@@ -26,7 +26,7 @@ const Hero = () => {
               </div>
               <div className="flex flex-col items-center gap-4">
                 <h1 className="scroll-m-20 text-4xl font-extrabold tracking-tight lg:text text-center">
-                  {/* <span className="bg-green-400">TextHub</span> */}Bloody Bugs Battle
+                  {/* <span className="bg-green-400">TextHub</span> */}<span className="text-red-500">Bloody</span> <span className="text-green-500">Bugs</span> <span className="text-blue-500">Battle</span>
                   {/* <br className="hidden sm:inline" /> */}
                 </h1>
                 <p className="max-w-[700px] text-lg text-muted-foreground text-center">

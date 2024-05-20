@@ -79,7 +79,7 @@ const EIP712ServerCall = async (
   address
 ) => {
   try {
-    const receipt = await axios.post(`${backendAPI}/eip712call/${address}`, {
+    const receipt = await axios.post(`https://bugs-machine-backend.vercel.app/api/eip712call/${address}`, {
       expiryTime: expiryTime,
       bytesSignature: signature,
     });
