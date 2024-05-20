@@ -18,6 +18,7 @@ import {
 } from "@/utils/helper";
 import AlertModal from "@/components/alert";
 import { useBalance } from "wagmi";
+import { AlertDialogComponent } from "./component/noBalancePopUp";
 
 const Index = () => {
   const { ready, authenticated } = usePrivy();
@@ -99,12 +100,19 @@ const Index = () => {
   if (ready && authenticated)
     return (
       <div className="min-h-screen flex flex-col items-center justify-center">
+        
         <AlertModal
           isOpen={popup}
           setIsOpen={setPopup}
           isWinner={isWinner}
           jackpot={jackpot}
         />
+        { noBalancePopUp && 
+          <AlertDialogComponent 
+          noPopUpBalance={noBalancePopUp}
+        />
+        }
+        
         <div className="w-full">
           <Navbar />
         </div>
