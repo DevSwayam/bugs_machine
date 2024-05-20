@@ -34,7 +34,7 @@ const Hero = () => {
                 </p>
                 <div className="flex justify-center items-center gap-3">
                   <Link href={"/bridge"}>
-                    <Button variant={"outline"}>Bridge Bugs</Button>
+                    <Button variant={"outline"}>Deposit Bugs</Button>
                   </Link>
                   <Link href={"/game"}>
                     <Button>Play Game</Button>
