@@ -46,6 +46,7 @@ export function AlertDialogComp({ bettingAmount, jackpot }) {
                       {jackpot === "0" ? "0" : jackpot.slice(0, -18)} Bugs
                     </span>
                   </li>
+                  <li>You have a 0.001% chance of hitting the jackpot.</li>
                 </ol>
               }
             />
