@@ -20,7 +20,7 @@ export function PlayGamePopup({ isOpen }) {
         <AlertDialogHeader>
           <AlertDialogTitle>You Can Now Use the Slot Machine</AlertDialogTitle>
           <AlertDialogDescription>
-            Please note that as you have just deposited BUGS, it may take 30 seconds for your balance to be reflected.
+            Please note that as you have just deposited BUGS, <span className="text-red-500">it may take 30 seconds</span> for your balance to be reflected.
           </AlertDialogDescription>
         </AlertDialogHeader>
         <AlertDialogFooter>
