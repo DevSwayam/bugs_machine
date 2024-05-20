@@ -64,7 +64,7 @@ const Index = () => {
   useEffect(() => {
     if (start) {
       toast(
-        "Bet can take some time to get reslut till then please wait paitently.."
+        "Bet can take some time to get result till then please wait paitently.."
       );
     }
   }, [start]);
