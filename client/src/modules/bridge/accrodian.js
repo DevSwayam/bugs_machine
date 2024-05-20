@@ -20,6 +20,7 @@ export function BridgeAccordian({ w0 }) {
   const [isBugsLocked, setIsBugsLocked] = useState(false);
   const [depositAmount, setDepositAmount] = useState("0");
   const [bridgeAmount, setBridgeAmount] = useState("0");
+  const [waitingForApproval, setWaitingForApproval] = useState(false);
   // const [isMintSuccess, setIsMintSuccess] = useState(false);
 
   return (
@@ -28,14 +29,26 @@ export function BridgeAccordian({ w0 }) {
       <AccordionItem value="item-3">
         <AccordionTrigger>Mint Test Bugs</AccordionTrigger>
         <AccordionContent className="bg-secondary p-2">
-          <div>
-            <p>You can mint 1000 test bugs to play</p>
-            <Button
-              className="bg-[#3673F5] hover:bg-[#3673F5]/60 mt-2 w-full"
-              onClick={() => mintBugs(w0)}>
-              Mint Bugs
-            </Button>
-          </div>
+          {waitingForApproval ? (
+            <div>
+              <p>Waiting for approval 🪲</p>
+              <Button
+                className="bg-[#3673F5] hover:bg-[#3673F5]/60 mt-2 w-full cursor-not-allowed opacity-50"
+              >
+                Mint Bugs
+              </Button>
+            </div>
+          ) : (
+            <div>
+              <p>You can mint 1000 test bugs to play</p>
+              <Button
+                className="bg-[#3673F5] hover:bg-[#3673F5]/60 mt-2 w-full"
+                onClick={() => mintBugs(w0, setWaitingForApproval)}
+              >
+                Mint Bugs
+              </Button>
+            </div>
+          )}
         </AccordionContent>
       </AccordionItem>
       <AccordionItem value="item-1">
@@ -53,7 +66,8 @@ export function BridgeAccordian({ w0 }) {
                 className="bg-[#3673F5] hover:bg-[#3673F5]/60 mt-2 w-full"
                 onClick={() =>
                   depositBugsCall(w0, bridgeAmount, setIsBugsLocked)
-                }>
+                }
+              >
                 Deposit Bugs
               </Button>
             </div>
@@ -67,7 +81,8 @@ export function BridgeAccordian({ w0 }) {
               />
               <Button
                 className="bg-[#3673F5] hover:bg-[#3673F5]/60 mt-2 w-full"
-                onClick={() => approveBugs(w0, depositAmount, setIsApprove)}>
+                onClick={() => approveBugs(w0, depositAmount, setIsApprove)}
+              >
                 Approve Bugs
               </Button>
             </div>
@@ -81,7 +96,8 @@ export function BridgeAccordian({ w0 }) {
             <p>You can withdraw all your remaining bugs</p>
             <Button
               className="bg-[#3673F5] hover:bg-[#3673F5]/60 mt-2 w-full"
-              onClick={() => withdrawBugs(w0)}>
+              onClick={() => withdrawBugs(w0)}
+            >
               Withdraw Bugs
             </Button>
           </div>

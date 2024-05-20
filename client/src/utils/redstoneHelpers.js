@@ -91,7 +91,8 @@ export const withdrawBugs = async (w0) => {
   }
 };
 
-export const mintBugs = async (w0) => {
+export const mintBugs = async (w0,setWaitingForApproval) => {
+  setWaitingForApproval(true);
   const provider = await w0?.getEthersProvider();
   const signer = await provider?.getSigner();
 
@@ -107,7 +108,11 @@ export const mintBugs = async (w0) => {
       console.log(`Amount: ${amount}`);
       if (to === w0.address) {
         count++;
-        if (count == 1) toast("Test bugs minted successfully!");
+        if (count == 1){
+          toast("Test bugs minted successfully!");
+          setWaitingForApproval(false);
+        }
+          
       }
     });
   } catch (error) {
