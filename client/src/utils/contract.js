@@ -7,6 +7,6 @@ export const bugsABI = bugsABIJSON;
 export const bugsBridgeABI = bugsBridgeABIJSON;
 
 export const slotMachineContractAddress =
-  "0x31F67a974298ced2887878d26928C5B92F6E6934";
+  "0x2cb657a3F86FF7A813a0d6c6245246CA8A8e8279";
 export const bugsContractAddress = "0x7cB3EfE0D5229AECf9A20CF52114C4748Bf12084";
-export const bugsBridgeContractAddress = "0xc2b6AEB74d24F67f97f0c1CABEc027567de4eB97";
+export const bugsBridgeContractAddress = "0x73EE7132cA87025B5e2EdB16045A72BF5D34aEd5";

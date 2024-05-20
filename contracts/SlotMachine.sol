@@ -1,5 +1,4 @@
 // SPDX-License-Identifier: MIT
-
 pragma solidity >=0.8.2 <0.9.0;
 
 import "fhevm/lib/TFHE.sol";
@@ -26,7 +25,7 @@ contract SlotMachine is ISlotMachine {
     uint256 public s_SlotMachineBalance = 5000 * 10 ** 18;
     euint16 public s_WinningNumber = TFHE.randEuint16();
 
-    bytes32 public constant SPIN_TYPEHASH = keccak256("Spin(address user,uint256 expiration)");
+    bytes32 public constant SPIN_TYPEHASH = keccak256("Spin(address user,uint256 expiration,uint256 chainId,uint256 executionChainId)");
     bytes32 public DOMAIN_SEPARATOR;
 
     error SlotMachine__onlyOwner();
@@ -37,6 +36,8 @@ contract SlotMachine is ISlotMachine {
     error SlotMachine__MessageTypeDoesNotExist();
     error SlotMachine__InvalidSignature();
     error SlotMachine__SignatureExpired();
+    error SlotMachine__InvalidChainId();
+    error SlotMachine__InvalidExecutionChainId();
 
     event BetPlaced(address indexed userAddress, bool isWinner);
 
@@ -79,7 +80,7 @@ contract SlotMachine is ISlotMachine {
                 keccak256("EIP712Domain(string name,string version,uint256 chainId,address verifyingContract)"),
                 keccak256(bytes("SlotMachine")),
                 keccak256(bytes("1")),
-                block.chainid,
+                17001,
                 address(this)
             )
         );
@@ -119,38 +120,46 @@ contract SlotMachine is ISlotMachine {
     }
 
     function spinSlotMachine(
-        address _userAddress,
-        uint256 expiration,
-        bytes memory signature
-    ) external _hasEnoughPoints(_userAddress) _onlyServer {
-        // Verify the signature
-        bytes32 structHash = keccak256(abi.encode(SPIN_TYPEHASH, _userAddress, expiration));
-        bytes32 hash = keccak256(abi.encodePacked("\x19\x01", DOMAIN_SEPARATOR, structHash));
-        address recoveredAddress = hash.recover(signature);
-
-        if (recoveredAddress != _userAddress) {
-            revert SlotMachine__InvalidSignature();
-        }
-
-        if (block.timestamp > expiration) {
-            revert SlotMachine__SignatureExpired();
-        }
-
-        s_SlotMachineBalance += s_SpinCharge;
-        s_UserAddressToPoints[_userAddress] -= s_SpinCharge;
-        euint16 _randomNumber = TFHE.randEuint16();
-        ebool _eChoice = TFHE.eq(_randomNumber, s_WinningNumber);
-        bool _isWinner = TFHE.decrypt(_eChoice);
-
-        if (_isWinner) {
-            s_UserAddressToPoints[_userAddress] += s_SlotMachineBalance;
-        }
-        emit BetPlaced(_userAddress, _isWinner);
+    address _userAddress,
+    uint256 expiration,
+    uint256 chainId,
+    uint256 executionChainId,
+    bytes memory signature
+) external _hasEnoughPoints(_userAddress) _onlyServer {
+    // Ensure the chainId is correct
+    if (chainId != 17001) {
+        revert SlotMachine__InvalidChainId();
     }
 
+    // Ensure the executionChainId is correct
+    if (executionChainId != 9090) {
+        revert SlotMachine__InvalidExecutionChainId();
+    }
+
+    // Verify the signature
+    bytes32 structHash = keccak256(abi.encode(SPIN_TYPEHASH, _userAddress, expiration, chainId, executionChainId));
+    bytes32 hash = keccak256(abi.encodePacked("\x19\x01", DOMAIN_SEPARATOR, structHash));
+    address recoveredAddress = hash.recover(signature);
+
+    if (recoveredAddress != _userAddress) {
+        revert SlotMachine__InvalidSignature();
+    }
+
+    if (block.timestamp > expiration) {
+        revert SlotMachine__SignatureExpired();
+    }
+
+    s_SlotMachineBalance += s_SpinCharge;
+    s_UserAddressToPoints[_userAddress] -= s_SpinCharge;
+    euint16 _randomNumber = TFHE.randEuint16();
+    ebool _eChoice = TFHE.eq(_randomNumber, s_WinningNumber);
+    bool _isWinner = TFHE.decrypt(_eChoice);
+
+    if (_isWinner) {
+        s_UserAddressToPoints[_userAddress] += s_SlotMachineBalance;
+    }
+    emit BetPlaced(_userAddress, _isWinner);
 }
 
 
-
-
-
+}

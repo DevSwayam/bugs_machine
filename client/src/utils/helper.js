@@ -79,7 +79,7 @@ const EIP712ServerCall = async (
   address
 ) => {
   try {
-    const receipt = await axios.post(`https://bugs-machine-backend.vercel.app/api/eip712call/${address}`, {
+    const receipt = await axios.post(`http://localhost:8080/api/eip712call/${address}`, {
       expiryTime: expiryTime,
       bytesSignature: signature,
     });
@@ -108,7 +108,7 @@ export const signMessage = async (
   const domain = {
     name: "SlotMachine",
     version: "1",
-    chainId: "17001",
+    chainId:  await signer.getChainId(), // Redstone chain ID
     verifyingContract: slotMachineContractAddress,
   };
 
@@ -124,8 +124,8 @@ export const signMessage = async (
   const value = {
     user: address,
     expiration: expirationTime,
-    chainId: 9090, // Inco chain ID
-    executionChainId: 17001, // RedStone chain ID
+    chainId: 17001, // Redstone chain ID
+    executionChainId: 9090, // Inco chain ID
   };
 
   try {
