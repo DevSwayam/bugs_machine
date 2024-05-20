@@ -63,7 +63,7 @@
     transform: translateY(0);
   }
   100% {
-    transform: translateY(-300%);
+    transform: translateY(-450%);
   }
 }
 
@@ -80,35 +80,35 @@
 }
 
 .ringMoving1 {
-  height: 100px;
-  width: 100px;
+  height: 95px;
+  width: 95px;
   line-height: 200px;
   text-align: center;
   font-size: 4em;
-  animation: goaround 0.2s linear infinite;
+  animation: goaround 0.7s linear infinite;
 }
 
 .ringMoving2 {
-  height: 100px;
-  width: 100px;
+  height: 95px;
+  width: 95px;
   line-height: 200px;
   text-align: center;
   font-size: 4em;
-  animation: goaround 0.4s linear infinite;
+  animation: goaround 1.2s linear infinite;
 }
 
 .ringMoving3 {
-  height: 100px;
-  width: 100px;
+  height: 95px;
+  width: 95px;
   line-height: 200px;
   text-align: center;
   font-size: 4em;
-  animation: goaround 0.2s linear infinite;
+  animation: goaround 1.7s linear infinite;
 }
 
 .spinAnimation {
   animation-name: goaround;
-  animation-duration: 2s;
+  animation-duration: 4s;
   animation-timing-function: ease-in-out; /* Smooth transition */
 }
 .stopAnimation {

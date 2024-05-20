@@ -103,21 +103,21 @@ const Row2 = ({ spin, ring2 }) => {
           height={95}
           src={Tube}
           alt="Tube"
-          className="ringMoving1"
+          className="ringMoving2"
         />
         <Image
           width={95}
           height={95}
           src={Bug}
           alt="Bug"
-          className="ringMoving1"
+          className="ringMoving2"
         />
         <Image
           width={95}
           height={95}
           src={Drug}
           alt="Drug"
-          className="ringMoving1"
+          className="ringMoving2"
         />
       </>
     );
