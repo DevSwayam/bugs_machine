@@ -17,6 +17,7 @@ import {
   eventListener,
 } from "@/utils/helper";
 import AlertModal from "@/components/alert";
+import { useBalance } from "wagmi";
 
 const Index = () => {
   const { ready, authenticated } = usePrivy();
@@ -36,7 +37,7 @@ const Index = () => {
   const [userBalance, setUserBalance] = useState("0");
   const [popup, setPopup] = useState(false);
   const [isWinner, setisWinner] = useState(false);
-  // console.log(w0.chainId)
+  const [noBalancePopUp, setIsNoBalancePopUp] = useState(false);
 
   const handlePlay = () => {
     play(
@@ -53,7 +54,6 @@ const Index = () => {
       setValue,
       setPopup
     );
-
   };
 
   useEffect(() => {
@@ -83,7 +83,7 @@ const Index = () => {
     if (ready && authenticated && w0?.address !== undefined) {
       if (w0.chainId === "eip155:9090" && ready) {
         setNetworkName(chainsName.inco);
-        checkUserBalance(w0, setUserBalance, setStart);
+        checkUserBalance(w0, setUserBalance, setStart,setIsNoBalancePopUp);
         checkSlotMachineBalance(w0, setJackpot, setStart);
         checkBettingAmmount(w0, setBettingAmount, setStart);
       }
@@ -158,6 +158,7 @@ const Index = () => {
               play={handlePlay}
               betSuccess={true}
               start={start}
+              noBalancePopUp={noBalancePopUp}
             />
           </div>
         </div>

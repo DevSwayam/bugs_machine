@@ -4,7 +4,7 @@ import { SlotMachineABI, slotMachineContractAddress } from "./contract";
 import axios from "axios";
 const backendAPI = process.env.backendAPI;
 
-export const checkUserBalance = async (w0, setUserBalance, setStart) => {
+export const checkUserBalance = async (w0, setUserBalance, setStart,setIsNoBalancePopUp) => {
   const provider = await w0?.getEthersProvider();
   const signer = await provider?.getSigner();
   const contractSM = new Contract(
@@ -18,6 +18,9 @@ export const checkUserBalance = async (w0, setUserBalance, setStart) => {
 
     const bigNumber = ethers.BigNumber.from(ptsBalance);
     setUserBalance(bigNumber.toString());
+    if(bigNumber.toString() === "0"){
+      setIsNoBalancePopUp(true);
+    }
   } catch (error) {
     setStart(false);
     console.log(error);

@@ -16,9 +16,10 @@ const SlotMachine = ({
   play,
   betSuccess,
   start,
+  noBalancePopUp,
 }) => {
   return (
-    <div >
+    <div>
       {/* <p className="text-center -mt-10 my-4 text-2xl text-[#BCD0FC]">Slot Machine</p> */}
       {/* <div className="mb-8 flex flex-col items-center justify-between w-full h-6">
         <div className="w-full flex items-center justify-between">
@@ -41,23 +42,36 @@ const SlotMachine = ({
           {<Row3 spin={spin} ring3={ring3} />}
         </div>
       </div>
-
-      <div>
-        {betSuccess && (
-          <div>
-            <Button
-              onClick={play}
-              disabled={start}
-              className="w-full mt-4 text-black">
-              {start
-                ? "Loading..."
-                : `Bet ${
-                    bettingAmount === "0" ? "0" : bettingAmount.slice(0, -18)
-                  } Bugs`}
-            </Button>
-          </div>
-        )}
-      </div>
+      {noBalancePopUp ? (
+        <div>
+            <div>
+              <Button
+                disabled={true}
+                className="w-full mt-4 text-black"
+              >
+              You Dont have credits.
+              </Button>
+            </div>
+        </div>
+      ) : (
+        <div>
+          {betSuccess && (
+            <div>
+              <Button
+                onClick={play}
+                disabled={start}
+                className="w-full mt-4 text-black"
+              >
+                {start
+                  ? "Loading..."
+                  : `Bet ${
+                      bettingAmount === "0" ? "0" : bettingAmount.slice(0, -18)
+                    } Bugs`}
+              </Button>
+            </div>
+          )}
+        </div>
+      )}
     </div>
   );
 };
