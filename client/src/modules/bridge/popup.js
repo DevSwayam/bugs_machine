@@ -18,10 +18,9 @@ export function PlayGamePopup({ isOpen }) {
     <AlertDialog open={isOpen}>
       <AlertDialogContent>
         <AlertDialogHeader>
-          <AlertDialogTitle>Please Switch the chain</AlertDialogTitle>
+          <AlertDialogTitle>You Can Now Use the Slot Machine</AlertDialogTitle>
           <AlertDialogDescription>
-            This action cannot be undone. This will permanently delete your
-            account and remove your data from our servers.
+            Please note that as you have just deposited BUGS, it may take 30 seconds for your balance to be reflected.
           </AlertDialogDescription>
         </AlertDialogHeader>
         <AlertDialogFooter>
