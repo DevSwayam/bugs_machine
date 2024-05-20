@@ -41,7 +41,7 @@ export function BridgeAccordian({ w0 }) {
         </AccordionContent>
       </AccordionItem>
       <AccordionItem value="item-1">
-        <AccordionTrigger> Bridge Bugs</AccordionTrigger>
+        <AccordionTrigger> Deposit Bugs</AccordionTrigger>
         <AccordionContent className="bg-secondary p-2">
           {isApprove ? (
             <div>
