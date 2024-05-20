@@ -30,7 +30,7 @@ const Hero = () => {
                   {/* <br className="hidden sm:inline" /> */}
                 </h1>
                 <p className="max-w-[700px] text-lg text-muted-foreground text-center">
-                Join the Decentralized Thrill of the Slot Machine Game on Inco Network! Fairness Guaranteed, Jackpots Growing!
+                Tired of being BUGS poor? Try your luck with the Bugs Slot Machine! Disclaimer: the Machine is NOT audited, secure and might be a bit buggy itself. Play if you dare! 🐞🎰
                 </p>
                 <div className="flex justify-center items-center gap-3">
                   <Link href={"/bridge"}>
