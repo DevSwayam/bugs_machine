@@ -142,6 +142,7 @@ export const signMessage = async (
     // Send signature to server for further processing
     // console.log(signature);
   } catch (error) {
+    setStart(false)
     console.error("Error signing message:", error.message);
   }
 };

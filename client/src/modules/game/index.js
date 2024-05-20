@@ -120,10 +120,13 @@ const Index = () => {
         <div className="grid grid-cols-2 grid-rows-9 h-screen w-full md:max-w-[400px] px-4 md:px-0 mt-16">
           <div className="col-span-2 row-span-1">
             <div className="w-full flex gap-2 flex-col justify-between items-center text-[#BCD0FC]">
-              <AlertDialogComp
-                bettingAmount={bettingAmount}
-                jackpot={jackpot}
-              />
+              {
+                jackpot !== "0" &&
+                  <AlertDialogComp
+                  bettingAmount={bettingAmount}
+                  jackpot={jackpot}
+                />
+              }
 
               <div className="w-full flex">
                 <div className="flex justify-between w-full">

@@ -14,7 +14,7 @@ import { Info } from "lucide-react";
 
 export function AlertDialogComp({ bettingAmount, jackpot }) {
   return (
-    <AlertDialog>
+    <AlertDialog defaultOpen={true}>
       <AlertDialogTrigger asChild>
         <div className="-mt-9 w-full flex justify-end">
           <div>
@@ -47,6 +47,24 @@ export function AlertDialogComp({ bettingAmount, jackpot }) {
                     </span>
                   </li>
                   <li>You have a 1/10000 chance of hitting the jackpot.</li>
+                  <li>
+                    {jackpot === "0" ? (
+                      <span className="text-[#3FF480]">0</span>
+                    ) : (
+                      <span className="text-[#3FF480]">
+                        {((parseInt(jackpot.slice(0, -18)) - 5000) / 2).toFixed(
+                          0
+                        )}
+                      </span>
+                    )}{" "}
+                    spins 🎰 have been made!
+                  </li>
+
+                  <li>
+                    The machine charges{" "}
+                    <span className="text-[#3FF480]">no fees</span>; it's
+                    winner-takes-all!
+                  </li>
                 </ol>
               }
             />

@@ -63,10 +63,10 @@ const SlotMachine = ({
                 className="w-full mt-4 text-black"
               >
                 {start
-                  ? "Loading..."
+                  ? "Spinning BUGS"
                   : `Bet ${
                       bettingAmount === "0" ? "0" : bettingAmount.slice(0, -18)
-                    } Bugs`}
+                    } Bugs`} 🪲
               </Button>
             </div>
           )}
