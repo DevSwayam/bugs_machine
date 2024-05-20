@@ -30,7 +30,7 @@ export function BridgeAccordian({ w0 }) {
         <AccordionTrigger>Mint Test Bugs</AccordionTrigger>
         <AccordionContent className="bg-secondary p-2">
             <div>
-              <p>You can mint 1000 test bugs to play</p>
+              <p>Mint 1000 test BUGS to start playing!</p>
               <Button
                 className="bg-[#3673F5] hover:bg-[#3673F5]/60 mt-2 w-full"
                 onClick={() => mintBugs(w0)}
@@ -62,7 +62,7 @@ export function BridgeAccordian({ w0 }) {
             </div>
           ) : (
             <div>
-              <p> You, first need to approve the smart contract</p>
+              <p> You first need to approve the smart contract.</p>
               <Input
                 className="py-2 px-2 mt-4 bg-transparent border-[#3673F5] text-[#3673F5] focus-visible:outline-none focus-visible:ring-0 focus-visible:ring-offset-0"
                 value={depositAmount}
@@ -84,7 +84,7 @@ export function BridgeAccordian({ w0 }) {
         <AccordionTrigger>Withdraw Bugs</AccordionTrigger>
         <AccordionContent className="bg-secondary p-2">
           <div>
-            <p>You can withdraw all your remaining bugs</p>
+            <p>You can withdraw all your remaining BUGS.</p>
             <Button
               className="bg-[#3673F5] hover:bg-[#3673F5]/60 mt-2 w-full"
               onClick={() => withdrawBugs(w0)}
