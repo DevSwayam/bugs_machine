@@ -29,26 +29,15 @@ export function BridgeAccordian({ w0 }) {
       <AccordionItem value="item-3">
         <AccordionTrigger>Mint Test Bugs</AccordionTrigger>
         <AccordionContent className="bg-secondary p-2">
-          {waitingForApproval ? (
-            <div>
-              <p>Waiting for approval 🪲</p>
-              <Button
-                className="bg-[#3673F5] hover:bg-[#3673F5]/60 mt-2 w-full cursor-not-allowed opacity-50"
-              >
-                Mint Bugs
-              </Button>
-            </div>
-          ) : (
             <div>
               <p>You can mint 1000 test bugs to play</p>
               <Button
                 className="bg-[#3673F5] hover:bg-[#3673F5]/60 mt-2 w-full"
-                onClick={() => mintBugs(w0, setWaitingForApproval)}
+                onClick={() => mintBugs(w0)}
               >
                 Mint Bugs
               </Button>
             </div>
-          )}
         </AccordionContent>
       </AccordionItem>
       <AccordionItem value="item-1">
@@ -73,17 +62,19 @@ export function BridgeAccordian({ w0 }) {
             </div>
           ) : (
             <div>
-              <p>You, first need to approve the smart contract</p>
+              <p> You, first need to approve the smart contract</p>
               <Input
                 className="py-2 px-2 mt-4 bg-transparent border-[#3673F5] text-[#3673F5] focus-visible:outline-none focus-visible:ring-0 focus-visible:ring-offset-0"
                 value={depositAmount}
                 onChange={(e) => setDepositAmount(e.target.value)}
               />
               <Button
-                className="bg-[#3673F5] hover:bg-[#3673F5]/60 mt-2 w-full"
-                onClick={() => approveBugs(w0, depositAmount, setIsApprove)}
+                className={`bg-[#3673F5] hover:bg-[#3673F5]/60 mt-2 w-full ${
+                  waitingForApproval ? "cursor-not-allowed opacity-50" : ""
+                }`}
+                onClick={() => approveBugs(w0, depositAmount, setIsApprove,setWaitingForApproval)}
               >
-                Approve Bugs
+                {waitingForApproval ? "Approving..." : "Approve Bugs"}
               </Button>
             </div>
           )}

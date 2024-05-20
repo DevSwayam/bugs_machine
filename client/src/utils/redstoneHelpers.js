@@ -8,7 +8,8 @@ import {
 } from "./contract";
 import { toast } from "sonner";
 
-export const approveBugs = async (w0, depositAmmount, setIsApprove) => {
+export const approveBugs = async (w0, depositAmmount, setIsApprove,setWaitingForApproval) => {
+  setWaitingForApproval(true);
   const provider = await w0?.getEthersProvider();
   const signer = await provider?.getSigner();
 
@@ -23,6 +24,7 @@ export const approveBugs = async (w0, depositAmmount, setIsApprove) => {
       count++;
       if (count === 1) {
         setIsApprove(true);
+        setWaitingForApproval(false);
       }
       console.log("Approval event detected:");
       console.log(`Owner: ${owner}`);
@@ -33,6 +35,7 @@ export const approveBugs = async (w0, depositAmmount, setIsApprove) => {
     console.log("Event listener set up and running...");
   } catch (error) {
     toast("Error Occured!");
+    setWaitingForApproval(false);
     // setSpin(false);
   }
 };
@@ -91,7 +94,7 @@ export const withdrawBugs = async (w0) => {
   }
 };
 
-export const mintBugs = async (w0,setWaitingForApproval) => {
+export const mintBugs = async (w0) => {
   setWaitingForApproval(true);
   const provider = await w0?.getEthersProvider();
   const signer = await provider?.getSigner();
