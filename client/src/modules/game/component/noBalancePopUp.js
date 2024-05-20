@@ -9,9 +9,10 @@ import {
   AlertDialogTitle,
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
-import { Info } from "lucide-react";
+import { useRouter } from "next/navigation";
 
 export function AlertDialogComponent({ noPopUpBalance }) {
+  const router = useRouter();
   console.log(noPopUpBalance)
   return (
 
@@ -24,7 +25,7 @@ export function AlertDialogComponent({ noPopUpBalance }) {
         </AlertDialogHeader>
         <AlertDialogFooter>
           {/* <AlertDialogCancel>Cancel</AlertDialogCancel> */}
-          <AlertDialogAction className="w-full">Understood!</AlertDialogAction>
+          <AlertDialogAction className="w-full" onClick={()=>{router.push("/bridge")}}>Get Bugs!</AlertDialogAction>
         </AlertDialogFooter>
       </AlertDialogContent>
     </AlertDialog>
