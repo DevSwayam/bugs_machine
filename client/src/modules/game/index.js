@@ -54,11 +54,6 @@ const Index = () => {
       setPopup
     );
 
-    // eventListener(w0, setisWinner, setStart, setValue, setPopup);
-
-    // setTimeout(() => {
-    //   setValue(200);
-    // }, 2000);
   };
 
   useEffect(() => {
@@ -72,12 +67,11 @@ const Index = () => {
   useEffect(() => {
     if (value !== -1) {
       stopSpining(setRing1, setRing2, setRing3);
-      // setTimeout(() => {
-      //   setPopup(true);
-      //   getBugBalance();
-      // }, 1000);
       setStart(false);
       setValue(-1);
+      checkUserBalance(w0, setUserBalance, setStart);
+      checkSlotMachineBalance(w0, setJackpot, setStart);
+      checkBettingAmmount(w0, setBettingAmount, setStart);
     }
   }, [value]);
 

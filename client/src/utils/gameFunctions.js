@@ -110,14 +110,5 @@ export const play = async (
     setRing1();
     setRing2();
     setRing3();
-    // if (input <= balance && input >= 1) {
-    //   setRealBet(input);
-    //   setSpin(true);
-    //   setRing1();
-    //   setRing2();
-    //   setRing3();
-    // } else {
-    //   setPrice(10);
-    // }
   }
 };
