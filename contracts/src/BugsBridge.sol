@@ -30,7 +30,7 @@ interface ISlotMachine {
     ) external returns(uint8,uint256,address);
 }
 
-import {IERC20} from "https://github.com/OpenZeppelin/openzeppelin-contracts/blob/master/contracts/token/ERC20/ERC20.sol";
+import {IERC20} from "../lib/openzeppelin-contracts/contracts/token/ERC20/ERC20.sol";
 
 contract BugsBridge {
     // For initialising contract only Once
