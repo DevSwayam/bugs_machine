@@ -62,7 +62,7 @@ export function AlertDialogComp({ bettingAmount, jackpot }) {
 
                   <li>
                     The machine charges{" "}
-                    <span className="text-[#3FF480]">no fees</span>; it's
+                    <span className="text-[#3FF480]">no fees</span>; it&apos;s
                     winner-takes-all!
                   </li>
                 </ol>
