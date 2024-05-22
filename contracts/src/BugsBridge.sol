@@ -1,6 +1,10 @@
 // SPDX-License-Identifier: MIT
 
 pragma solidity >=0.8.2 <0.9.0;
+import {IERC20} from "../lib/openzeppelin-contracts/contracts/token/ERC20/ERC20.sol";
+import {Ownable} from "../lib/openzeppelin-contracts/contracts/access/Ownable.sol";
+import {Initializable} from "../lib/openzeppelin-contracts/contracts/proxy/utils/Initializable.sol";
+import {ReentrancyGuard} from "../lib/openzeppelin-contracts/contracts/security/ReentrancyGuard.sol";
 
 /*//////////////////////////////////////////////////////////////
                            Interface
@@ -8,285 +12,424 @@ pragma solidity >=0.8.2 <0.9.0;
 
 interface IInterchainExecuteRouter {
     function callRemote(
-        uint32 _destination,
-        address _to,
+        uint32 _destinationDomain,
+        address _targetAddress,
         uint256 _value,
         bytes calldata _data,
-        bytes memory _callback
+        bytes memory _callbackData
     ) external returns (bytes32);
 
-    function getRemoteInterchainAccount(uint32 _destination, address _owner)
-        external
-        view
-        returns (address);
+    function getRemoteInterchainAccount(
+        uint32 _destinationDomain,
+        address _ownerAddress
+    ) external view returns (address);
 }
-
 
 interface ISlotMachine {
     function handle(
         uint8 _messageType,
         uint256 _amount,
         address _userAddress
-    ) external returns(uint8,uint256,address);
+    ) external returns (uint8, uint256, address);
 }
 
-import {IERC20} from "../lib/openzeppelin-contracts/contracts/token/ERC20/ERC20.sol";
+contract BugsBridge is ReentrancyGuard, Ownable , Initializable{
 
-contract BugsBridge {
-    // For initialising contract only Once
-    bool private s_IsInitialised;
+    /*//////////////////////////////////////////////////////////////
+                                 STATE VARIABLES
+    //////////////////////////////////////////////////////////////*/
 
-    // Address of the SlotMachine contract on Inco Network
+    // Address of the SlotMachine contract on the Inco Network
     address private s_SlotMachineContractAddress;
 
-    // Domain for Inco Network
+    // Domain identifier for the Inco Network
     uint32 private constant s_DestinationDomain = 9090;
 
-    // callback Router Contract Deployed on RedStone Network
+    // Address of the Interchain Execute Router on the RedStone Network
     address private s_IexRouter;
 
-    // EOA address of owner for intialisation of contract
-    address immutable i_Owner;
-
-    // ERC20 Contract Address for BUGS
+    // ERC20 Contract Address for BUGS token
     address private s_BugsContractAddress;
 
-    // The Allowed caller Contract which can call callback functions
+    // Allowed caller contract address for callback functions
     address private s_CallerContract;
 
-    // Mapping of userAddress to isWaiting
+    // Mapping of user addresses to their waiting status
     mapping(address => bool) private s_UserAddressToIsWaiting;
 
-    // Mapping of userAddress to the amount of bugs locked in contract
+    // Mapping of user addresses to the amount of locked BUGS tokens
     mapping(address => uint256) private s_UserAddressToLockBugs;
 
+    // Indicates if the Slot Machine is operational
+    bool private s_IsSlotMachineWorking;
+
+    // Message type identifiers
     uint8 private constant s_DepositMessageType = 1;
-    uint8 private constant s_WithdrawMwssageType = 2;
+    uint8 private constant s_WithdrawMessageType = 2;
 
     /*//////////////////////////////////////////////////////////////
                                  EVENTS
     //////////////////////////////////////////////////////////////*/
 
-    event bugsDeposited(
-        address indexed userAddress,
-        uint256 indexed bugsAmount
-    );
+    event BugsDeposited(address indexed userAddress, uint256 indexed bugsAmount);
+    event BugsWithdrawn(address indexed userAddress, uint256 indexed bugsAmount);
+    event CallBackConfirmed(address indexed userAddress);
 
     /*//////////////////////////////////////////////////////////////
                                  Errors
     //////////////////////////////////////////////////////////////*/
-    error BridgeContract__onlyOwmer();
-    error BridgeContract__alreadyInitialised();
-    error BridgeContract__userDoesnotHaveEnoughBugs();
+    error BridgeContract__OnlyOwner();
+    error BridgeContract__AlreadyInitialized();
+    error BridgeContract__UserDoesNotHaveEnoughBugs();
     error BridgeContract__UserApprovalAmountIsNotSufficient();
     error BridgeContract__WaitingToGetResolved();
     error BridgeContract__OnlyCallerContract();
     error BridgeContract__UserDidNotLockBugs();
     error BridgeContract__MessageTypeDoesNotExist();
     error BridgeContract__UserDidNotDepositSufficientBugs();
+    error BridgeContract__SlotMachineIsNotWorking();
+    error BridgeContract__AddressCannotBeZero();
+    error BridgeContract__GreaterThanSlotMachineBalance();
+    error BridgeContract__AmountCannotBeZero();
 
     /*//////////////////////////////////////////////////////////////
                                MODIFIERS
     //////////////////////////////////////////////////////////////*/
-    modifier _onlyOwner() {
-        if (msg.sender != i_Owner) {
-            revert BridgeContract__onlyOwmer();
+
+    modifier notZeroAddress(address _address) {
+        if (_address == address(0)) {
+            revert BridgeContract__AddressCannotBeZero();
         }
         _;
     }
 
-    modifier _isInitialised() {
-        if (s_IsInitialised) {
-            revert BridgeContract__alreadyInitialised();
+    modifier isGamePlayable() {
+        if (!s_IsSlotMachineWorking) {
+            revert BridgeContract__SlotMachineIsNotWorking();
         }
         _;
     }
 
-    modifier _onlyOnce() {
-        if (s_UserAddressToIsWaiting[msg.sender] == true) {
+    modifier onlyOnce() {
+        if (s_UserAddressToIsWaiting[msg.sender]) {
             revert BridgeContract__WaitingToGetResolved();
         }
         _;
     }
 
-    modifier _onlyCallerContract() {
+    modifier onlyCallerContract() {
         if (msg.sender != s_CallerContract) {
             revert BridgeContract__OnlyCallerContract();
         }
         _;
     }
 
-    /*//////////////////////////////////////////////////////////////
-                                Constructor
-    //////////////////////////////////////////////////////////////*/
-    constructor() {
-        i_Owner = msg.sender;
+    modifier amountCannotBeZero(uint256 _amount) {
+        if (_amount == 0) {
+            revert BridgeContract__AmountCannotBeZero();
+        }
+        _;
     }
 
     /*//////////////////////////////////////////////////////////////
-                                External Functions
+                                Owner Only Functions
     //////////////////////////////////////////////////////////////*/
 
+    /**
+     * @notice Initializes the contract with necessary addresses
+     * @param _iexRouter Address of the IexRouter contract
+     * @param _callerContract Address of the caller contract
+     * @param _slotMachineContractAddress Address of the SlotMachine contract
+     * @param _bugsContractAddress Address of the BUGS token contract
+     */
     function initialize(
         address _iexRouter,
-        address _caller_contract,
-        address _slotmachineContractAddress,
+        address _callerContract,
+        address _slotMachineContractAddress,
         address _bugsContractAddress
-    ) external _onlyOwner _isInitialised {
-        s_IexRouter = _iexRouter; // caller contract and iex router would be same
-        s_CallerContract = _caller_contract; // caller contract and iex router would be same
-        s_BugsContractAddress = _bugsContractAddress; // erc20 contract address
-        s_SlotMachineContractAddress = _slotmachineContractAddress; // destination contract address
-        s_IsInitialised = true;
+    ) external onlyOwner initializer {
+        s_IexRouter = _iexRouter;
+        s_CallerContract = _callerContract;
+        s_BugsContractAddress = _bugsContractAddress;
+        s_SlotMachineContractAddress = _slotMachineContractAddress;
+        s_IsSlotMachineWorking = true;
     }
 
-    function depositBugs(uint256 _bugsAmount) external _onlyOnce {
-        address _userAddress = msg.sender;
+    /**
+     * @notice Updates the owner address
+     * @param _newOwnerAddress New owner address
+     */
+    function updateOwnerAddress(address _newOwnerAddress) external onlyOwner notZeroAddress(_newOwnerAddress){
+        transferOwnership(_newOwnerAddress);
+    }
 
-        IERC20 _bugs = IERC20(s_BugsContractAddress);
+    /**
+     * @notice Updates the caller contract address
+     * @param _newCallerContract New caller contract address
+     */
+    function updateCallerContract(address _newCallerContract) external onlyOwner notZeroAddress(_newCallerContract){
+        s_CallerContract = _newCallerContract;
+    }
 
-        // check the balance of user from bugs contract if not sufficient revert
-        uint256 _userBugsBalance = _bugs.balanceOf(_userAddress);
+    /**
+     * @notice Updates the IexRouter address
+     * @param _newIexRouter New IexRouter address
+     */
+    function updateIexRouter(address _newIexRouter) external onlyOwner notZeroAddress(_newIexRouter){
+        s_IexRouter = _newIexRouter;
+    }
 
-        if (_userBugsBalance < _bugsAmount) {
-            revert BridgeContract__userDoesnotHaveEnoughBugs();
+    /**
+     * @notice Updates the SlotMachine contract address
+     * @param _newSlotMachineAddress New SlotMachine contract address
+     */
+    function updateSlotMachineAddress(address _newSlotMachineAddress) external onlyOwner notZeroAddress(_newSlotMachineAddress){
+        s_SlotMachineContractAddress = _newSlotMachineAddress;
+    }
+
+    /**
+     * @notice Allows the owner to withdraw all BUGS tokens from the contract
+     * @param _receiverAddress Address to receive the withdrawn BUGS tokens
+     */
+    function withdrawSlotMachineBugs(address _receiverAddress) external onlyOwner notZeroAddress(_receiverAddress) {
+        uint256 slotMachineBalance = IERC20(s_BugsContractAddress).balanceOf(address(this));
+        IERC20(s_BugsContractAddress).transfer(_receiverAddress, slotMachineBalance);
+    }
+
+    /**
+     * @notice Allows the owner to free a specific user and fund them with a specified amount
+     * @param _userAddress Address of the user to free
+     * @param _amount Amount of BUGS tokens to fund the user with
+     */
+    function freeUser(address _userAddress, uint256 _amount) external onlyOwner notZeroAddress(_userAddress) {
+        s_UserAddressToIsWaiting[_userAddress] = false;
+        s_UserAddressToLockBugs[_userAddress] = 0;
+        if (_amount != 0) {
+            uint256 slotMachineBalance = IERC20(s_BugsContractAddress).balanceOf(address(this));
+            if (_amount > slotMachineBalance) {
+                revert BridgeContract__GreaterThanSlotMachineBalance();
+            }
+            IERC20(s_BugsContractAddress).transfer(_userAddress, _amount);
+        }
+    }
+
+    /*//////////////////////////////////////////////////////////////
+                                User Accessible Functions
+    //////////////////////////////////////////////////////////////*/
+
+    /**
+     * @notice Allows a user to deposit BUGS tokens into the contract
+     * @param _bugsAmount Amount of BUGS tokens to deposit
+     */
+    function depositBugs(
+        uint256 _bugsAmount
+    ) external onlyOnce isGamePlayable amountCannotBeZero(_bugsAmount) nonReentrant{
+
+        address userAddress = msg.sender;
+        IERC20 bugs = IERC20(s_BugsContractAddress);
+
+        uint256 userBugsBalance = bugs.balanceOf(userAddress);
+        if (userBugsBalance < _bugsAmount) {
+            revert BridgeContract__UserDoesNotHaveEnoughBugs();
         }
 
-        // check the whether the contract has approval is not revert
-        uint256 _userTotalApproval = _bugs.allowance(
-            _userAddress,
-            address(this)
-        );
-
-        if (_userTotalApproval < _bugsAmount) {
+        uint256 userTotalApproval = bugs.allowance(userAddress, address(this));
+        if (userTotalApproval < _bugsAmount) {
             revert BridgeContract__UserApprovalAmountIsNotSufficient();
         }
 
-        _bugs.transferFrom(_userAddress, address(this), _bugsAmount);
+        bugs.transferFrom(userAddress, address(this), _bugsAmount);
+        emit BugsDeposited(userAddress, _bugsAmount);
 
-        s_UserAddressToIsWaiting[_userAddress] = true;
-        s_UserAddressToLockBugs[_userAddress] += _bugsAmount;
-
-        // Emit the betting event for users
-        emit bugsDeposited(_userAddress, _bugsAmount);
-
-        bridgeCall(s_DepositMessageType, _bugsAmount, _userAddress);
+        bridgeCall(s_DepositMessageType, _bugsAmount, userAddress);
+        s_UserAddressToIsWaiting[userAddress] = true;
+        s_UserAddressToLockBugs[userAddress] += _bugsAmount;
     }
 
-    function withDrawAllRemainingBugs() external _onlyOnce {
-        address _userAddress = msg.sender;
+    /**
+     * @notice Allows a user to withdraw all remaining BUGS tokens from the contract
+     */
+    function withdrawAllRemainingBugs() external onlyOnce nonReentrant{
+        address userAddress = msg.sender;
 
-        if (s_UserAddressToLockBugs[_userAddress] == 0) {
+        if (s_UserAddressToLockBugs[userAddress] == 0) {
             revert BridgeContract__UserDidNotLockBugs();
         }
-        bridgeCall(s_WithdrawMwssageType, 0, _userAddress);
 
-        s_UserAddressToIsWaiting[_userAddress] = true;
-        
+        bridgeCall(s_WithdrawMessageType, 0, userAddress);
+        s_UserAddressToIsWaiting[userAddress] = true;
     }
 
-    function callConfirmation(uint8 _messageType, uint256 _amount ,uint256 _userAddress) external _onlyCallerContract {
-       
-       address userAddress = address(uint160(_userAddress));
-       
-       if(_messageType == 1){
-            s_UserAddressToIsWaiting[userAddress] = false;
-       }
-       else if(_messageType == 2){
-            IERC20(s_BugsContractAddress).transfer(userAddress,_amount);
-            s_UserAddressToIsWaiting[userAddress] = false;
-            s_UserAddressToLockBugs[userAddress] = 0;
-            
-       }else{
-        revert BridgeContract__MessageTypeDoesNotExist();
-       }
+    /*//////////////////////////////////////////////////////////////
+                                Bridge Only Function
+    //////////////////////////////////////////////////////////////*/
+
+    /**
+     * @notice Confirms the execution of a call on the bridge
+     * @param _messageType Type of the message (deposit or withdraw)
+     * @param _amount Amount of BUGS tokens
+     * @param _userAddress Address of the user
+     */
+    function callConfirmation(
+        uint8 _messageType,
+        uint256 _amount,
+        address _userAddress
+    ) external onlyCallerContract notZeroAddress(_userAddress) {
+
+        if (_messageType == s_DepositMessageType) {
+            s_UserAddressToIsWaiting[_userAddress] = false;
+        } else if (_messageType == s_WithdrawMessageType) {
+            settleWithdrawTransaction(_userAddress, _amount);
+        } else {
+            revert BridgeContract__MessageTypeDoesNotExist();
+        }
+        emit CallBackConfirmed(_userAddress);
     }
 
+    /*//////////////////////////////////////////////////////////////
+                                Internal-Private Functions
+    //////////////////////////////////////////////////////////////*/
+
+    /**
+     * @notice Makes a bridge call to execute a function on the destination chain
+     * @param _messageType Type of the message (deposit or withdraw)
+     * @param _amount Amount of BUGS tokens
+     * @param _userAddress Address of the user
+     */
     function bridgeCall(
         uint8 _messageType,
         uint256 _amount,
         address _userAddress
     ) internal {
-        // write logic here to make bridge call
-        ISlotMachine _slotMachine = ISlotMachine(s_SlotMachineContractAddress);
+        ISlotMachine slotMachine = ISlotMachine(s_SlotMachineContractAddress);
 
-        bytes memory _callback = abi.encodePacked(
-            this.callConfirmation.selector);
+        bytes memory callbackData = abi.encodePacked(this.callConfirmation.selector);
 
         IInterchainExecuteRouter(s_IexRouter).callRemote(
             s_DestinationDomain,
-            address(_slotMachine),
+            address(slotMachine),
             0,
             abi.encodeCall(
-                _slotMachine.handle,
+                slotMachine.handle,
                 (_messageType, _amount, _userAddress)
             ),
-            _callback
+            callbackData
         );
     }
 
-    // Getter functions
+    /**
+     * @notice Settles the withdrawal transaction for a user
+     * @param _userAddress Address of the user
+     * @param _amount Amount of BUGS tokens to withdraw
+     */
+    function settleWithdrawTransaction(
+        address _userAddress,
+        uint256 _amount
+    ) internal {
+        uint256 userLockedBugsAmount = s_UserAddressToLockBugs[_userAddress];
+        uint256 slotMachineBalance = IERC20(s_BugsContractAddress).balanceOf(address(this));
 
+        if (_amount > slotMachineBalance) {
+            revert BridgeContract__GreaterThanSlotMachineBalance();
+        }
+
+        if (_amount > userLockedBugsAmount) {
+            s_IsSlotMachineWorking = false;
+        }
+
+        if (_amount != 0) {
+            IERC20(s_BugsContractAddress).transfer(_userAddress, _amount);
+            emit BugsWithdrawn(_userAddress, _amount);
+        }
+
+        s_UserAddressToIsWaiting[_userAddress] = false;
+        s_UserAddressToLockBugs[_userAddress] = 0;
+    }
+
+    /*//////////////////////////////////////////////////////////////
+                             Getter Functions
+    //////////////////////////////////////////////////////////////*/
+
+    /**
+     * @notice Gets the Interchain Account for a given contract
+     * @param _contract Address of the contract
+     * @return Address of the Interchain Account
+     */
     function getICA(address _contract) external view returns (address) {
-        return
-            IInterchainExecuteRouter(s_IexRouter).getRemoteInterchainAccount(
-                s_DestinationDomain,
-                _contract
-            );
+        return IInterchainExecuteRouter(s_IexRouter).getRemoteInterchainAccount(s_DestinationDomain, _contract);
     }
 
-    // Getter for s_IsInitialized
-    function getIsInitialized() external view returns (bool) {
-        return s_IsInitialised;
-    }
-
-    // Getter for s_SlotMachineContractAddress
+    /**
+     * @notice Gets the SlotMachine contract address
+     * @return Address of the SlotMachine contract
+     */
     function getSlotMachineContractAddress() external view returns (address) {
         return s_SlotMachineContractAddress;
     }
 
-    // Getter for s_DestinationDomain
+    /**
+     * @notice Gets the destination domain identifier
+     * @return Destination domain identifier
+     */
     function getDestinationDomain() external pure returns (uint32) {
         return s_DestinationDomain;
     }
 
-    // Getter for s_IexRouter
+    /**
+     * @notice Gets the IexRouter address
+     * @return Address of the IexRouter
+     */
     function getIexRouter() external view returns (address) {
         return s_IexRouter;
     }
 
-    // Getter for i_Owner
-    function getOwner() external view returns (address) {
-        return i_Owner;
-    }
-
-    // Getter for s_BugsContractAddress
+    /**
+     * @notice Gets the BUGS token contract address
+     * @return Address of the BUGS token contract
+     */
     function getBugsContractAddress() external view returns (address) {
         return s_BugsContractAddress;
     }
 
-    // Getter for s_CallerContract
+    /**
+     * @notice Gets the caller contract address
+     * @return Address of the caller contract
+     */
     function getCallerContract() external view returns (address) {
         return s_CallerContract;
     }
 
-    // Getter for s_UserAddressToIsWaiting
-    function isUserWaiting(address userAddress) external view returns (bool) {
-        return s_UserAddressToIsWaiting[userAddress];
+    /**
+     * @notice Checks if a user is waiting
+     * @param _userAddress Address of the user
+     * @return True if the user is waiting, otherwise false
+     */
+    function isUserWaiting(address _userAddress) external view returns (bool) {
+        return s_UserAddressToIsWaiting[_userAddress];
     }
 
-    // Getter for s_UserAddressToLockBugs
-    function getUserLockedBugs(address userAddress) external view returns (uint256) {
-        return s_UserAddressToLockBugs[userAddress];
+    /**
+     * @notice Gets the amount of locked BUGS tokens for a user
+     * @param _userAddress Address of the user
+     * @return Amount of locked BUGS tokens
+     */
+    function getUserLockedBugs(address _userAddress) external view returns (uint256) {
+        return s_UserAddressToLockBugs[_userAddress];
     }
 
-    // Getter for s_DepositMessageType
+    /**
+     * @notice Gets the deposit message type identifier
+     * @return Deposit message type identifier
+     */
     function getDepositMessageType() external pure returns (uint8) {
         return s_DepositMessageType;
     }
 
-    // Getter for s_WithdrawMessageType
+    /**
+     * @notice Gets the withdraw message type identifier
+     * @return Withdraw message type identifier
+     */
     function getWithdrawMessageType() external pure returns (uint8) {
-        return s_WithdrawMwssageType;
+        return s_WithdrawMessageType;
     }
 }
