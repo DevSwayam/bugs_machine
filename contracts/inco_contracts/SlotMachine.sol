@@ -19,24 +19,52 @@ contract SlotMachine is ISlotMachine {
                                  STATE VARIABLES
     //////////////////////////////////////////////////////////////*/
 
+    // The owner's address who has administrative control over the contract.
     address private i_Owner;
+
+    // The address of the bridge contract deployed on this chain as an Inter-Chain Application (ICA).
     address private s_BridgeContractAddress;
+
+    // The server's address responsible for executing EIP712 signed transactions.
     address private s_ServerAddress;
+
+    // A mapping to store the amount of points held by each user.
     mapping(address => uint256) private s_UserAddressToPoints;
+
+    // The charge (in points) required for each spin of the slot machine.
     uint256 private s_SpinCharge = 100 * 10 ** 18;
+
+    // The domain identifier for the destination where the BUGS (tokens/points) are locked for the game to be playable.
     uint32 private s_DestinationDomain;
+
+    // The address of the IEX Router on this chain for handling cross-chain communication.
     address private s_IexRouter;
+
+    // The initial balance of the slot machine to be funded when the contract is deployed.
     uint256 private constant s_SlotMachineInititalBalance = 5000 * 10 ** 18;
+
+    // The current balance of the slot machine, which grows as players spin the machine.
     uint256 private s_SlotMachineBalance;
+
+    // The winning number that acts as the lucky number in the slot machine game.
     euint8 private s_WinningNumber;
-    uint256 private immutable s_ChainId = 17001;
+
+    // The destination chain ID used to create the domain separator for EIP712 signatures.
+    uint256 private constant s_ChainId = 17001;
+
+    // The chain ID of the blockchain where this contract is deployed.
     uint256 private constant s_ExecutionChainId = block.chainid;
+
+    // A boolean flag to check whether the slot machine game is currently playable or not.
     bool private s_IsSlotMachineWorking;
 
+    // Spin Type Hash for Signature verification
     bytes32 private constant SPIN_TYPEHASH =
         keccak256(
             "Spin(address user,uint256 expiration,uint256 chainId,uint256 executionChainId)"
         );
+    
+    // Domain Seperator which will be set on Deployment
     bytes32 private immutable DOMAIN_SEPARATOR;
 
     /*//////////////////////////////////////////////////////////////
@@ -60,6 +88,7 @@ contract SlotMachine is ISlotMachine {
     error SlotMachine__InvalidExecutionChainId();
     error SlotMachine__UserDoesNotHaveEnoughBalance();
     error SlotMachine__SlotMachineIsNotWorking();
+    error SlotMachine__addressCannotBeZero();
 
     /*//////////////////////////////////////////////////////////////
                                MODIFIERS
@@ -138,6 +167,13 @@ contract SlotMachine is ISlotMachine {
         address _iexRouter,
         address _serverAddress
     ) external _onlyOwner {
+        if (
+            _bridgeContract == address(0) ||
+            _iexRouter == address(0) ||
+            _serverAddress == address(0)
+        ) {
+            revert SlotMachine__addressCannotBeZero();
+        }
         s_DestinationDomain = _DestinationDomain;
         s_IexRouter = _iexRouter;
         s_BridgeContractAddress = _bridgeContract;
@@ -184,10 +220,9 @@ contract SlotMachine is ISlotMachine {
         uint256 executionChainId,
         bytes memory signature
     ) external _hasEnoughPoints(_userAddress) _onlyServer isGamePlayable {
-
         bytes32 structHash = keccak256(
             abi.encode(
-                SPIN_TYPEHASH,
+                SPIN_TYPE_HASH,
                 _userAddress,
                 expiration,
                 chainId,
@@ -226,7 +261,7 @@ contract SlotMachine is ISlotMachine {
 
         if (_isWinner) {
             s_UserAddressToPoints[_userAddress] += s_SlotMachineBalance;
-            s_SlotMachineBalance = s_SlotMachineInititalBalance; 
+            s_SlotMachineBalance = s_SlotMachineInititalBalance;
             s_IsSlotMachineWorking = false;
         }
         emit BetPlaced(_userAddress, _isWinner);
@@ -273,7 +308,9 @@ contract SlotMachine is ISlotMachine {
      * @param _userAddress Address of the user
      * @return Points of the user
      */
-    function getUserPoints(address _userAddress) external view returns (uint256) {
+    function getUserPoints(
+        address _userAddress
+    ) external view returns (uint256) {
         return s_UserAddressToPoints[_userAddress];
     }
 
