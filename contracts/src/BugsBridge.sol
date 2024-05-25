@@ -8,7 +8,7 @@ import {ReentrancyGuard} from "../lib/openzeppelin-contracts/contracts/security/
 
 /*//////////////////////////////////////////////////////////////
                            Interface
-    //////////////////////////////////////////////////////////////*/
+//////////////////////////////////////////////////////////////*/
 
 interface IInterchainExecuteRouter {
     function callRemote(
@@ -213,6 +213,15 @@ contract BugsBridge is ReentrancyGuard, Ownable , Initializable{
         }
     }
 
+    /**
+     * @notice Allows the owner to set the operational status of the slot machine
+     * @param _bool Boolean value indicating whether the slot machine should be working (true) or not (false)
+     */
+    function setSlotMachineWorkingStatus(bool _bool) external onlyOwner {
+        s_IsSlotMachineWorking = _bool;
+    }
+
+
     /*//////////////////////////////////////////////////////////////
                                 User Accessible Functions
     //////////////////////////////////////////////////////////////*/
@@ -345,6 +354,8 @@ contract BugsBridge is ReentrancyGuard, Ownable , Initializable{
         s_UserAddressToIsWaiting[_userAddress] = false;
         s_UserAddressToLockBugs[_userAddress] = 0;
     }
+
+
 
     /*//////////////////////////////////////////////////////////////
                              Getter Functions
