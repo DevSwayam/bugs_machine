@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: MIT
 pragma solidity >=0.8.2 <0.9.0;
 
-import "fhevm/lib/TFHE.sol";
+import "@fhevm/TFHE.sol";
 import "@openzeppelin/contracts/utils/cryptography/ECDSA.sol";
 
 interface ISlotMachine {
@@ -53,13 +53,13 @@ contract SlotMachine is ISlotMachine {
     uint256 private constant s_ChainId = 17001;
 
     // The chain ID of the blockchain where this contract is deployed.
-    uint256 private constant s_ExecutionChainId = block.chainid;
+    uint256 private immutable s_ExecutionChainId = block.chainid;
 
     // A boolean flag to check whether the slot machine game is currently playable or not.
     bool private s_IsSlotMachineWorking;
 
     // Spin Type Hash for Signature verification
-    bytes32 private constant SPIN_TYPEHASH =
+    bytes32 private constant SPIN_TYPE_HASH =
         keccak256(
             "Spin(address user,uint256 expiration,uint256 chainId,uint256 executionChainId)"
         );
@@ -88,7 +88,6 @@ contract SlotMachine is ISlotMachine {
     error SlotMachine__InvalidExecutionChainId();
     error SlotMachine__UserDoesNotHaveEnoughBalance();
     error SlotMachine__SlotMachineIsNotWorking();
-    error SlotMachine__addressCannotBeZero();
 
     /*//////////////////////////////////////////////////////////////
                                MODIFIERS
@@ -255,7 +254,7 @@ contract SlotMachine is ISlotMachine {
 
         s_SlotMachineBalance += s_SpinCharge;
         s_UserAddressToPoints[_userAddress] -= s_SpinCharge;
-        euint16 _randomNumber = TFHE.randEuint8();
+        euint8 _randomNumber = TFHE.randEuint8();
         ebool _eChoice = TFHE.eq(_randomNumber, s_WinningNumber);
         bool _isWinner = TFHE.decrypt(_eChoice);
 

@@ -1,10 +1,10 @@
 // SPDX-License-Identifier: MIT
 
 pragma solidity >=0.8.2 <0.9.0;
-import {IERC20} from "../lib/openzeppelin-contracts/contracts/token/ERC20/ERC20.sol";
-import {Ownable} from "../lib/openzeppelin-contracts/contracts/access/Ownable.sol";
-import {Initializable} from "../lib/openzeppelin-contracts/contracts/proxy/utils/Initializable.sol";
-import {ReentrancyGuard} from "../lib/openzeppelin-contracts/contracts/security/ReentrancyGuard.sol";
+import {IERC20} from "@openzeppelin/contracts/token/ERC20/ERC20.sol";
+import {Ownable} from "@openzeppelin/contracts/access/Ownable.sol";
+import {Initializable} from "@openzeppelin/contracts/proxy/utils/Initializable.sol";
+import {ReentrancyGuard} from "@openzeppelin/contracts/security/ReentrancyGuard.sol";
 
 /*//////////////////////////////////////////////////////////////
                            Interface
