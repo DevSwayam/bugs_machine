@@ -35,7 +35,7 @@ contract SlotMachine is ISlotMachine {
     uint256 private s_SpinCharge = 100 * 10 ** 18;
 
     // The domain identifier for the destination where the BUGS (tokens/points) are locked for the game to be playable.
-    uint32 private s_DestinationDomain;
+    uint32 private constant s_DestinationDomain = 17001;
 
     // The address of the IEX Router on this chain for handling cross-chain communication.
     address private s_IexRouter;
@@ -48,9 +48,6 @@ contract SlotMachine is ISlotMachine {
 
     // The winning number that acts as the lucky number in the slot machine game.
     euint8 private s_WinningNumber;
-
-    // The destination chain ID used to create the domain separator for EIP712 signatures.
-    uint256 private constant s_ChainId = 17001;
 
     // The chain ID of the blockchain where this contract is deployed.
     uint256 private immutable s_ExecutionChainId = block.chainid;
@@ -141,7 +138,7 @@ contract SlotMachine is ISlotMachine {
                 ),
                 keccak256(bytes("SlotMachine")),
                 keccak256(bytes("1")),
-                s_ChainId,
+                s_DestinationDomain,
                 address(this)
             )
         );
@@ -155,13 +152,11 @@ contract SlotMachine is ISlotMachine {
 
     /**
      * @notice Initializes the slot machine contract with necessary addresses and sets it to operational
-     * @param _DestinationDomain The domain identifier for the destination
      * @param _bridgeContract The address of the bridge contract
      * @param _iexRouter The address of the IEX router
      * @param _serverAddress The address of the server
      */
     function initialize(
-        uint32 _DestinationDomain,
         address _bridgeContract,
         address _iexRouter,
         address _serverAddress
@@ -173,7 +168,6 @@ contract SlotMachine is ISlotMachine {
         ) {
             revert SlotMachine__addressCannotBeZero();
         }
-        s_DestinationDomain = _DestinationDomain;
         s_IexRouter = _iexRouter;
         s_BridgeContractAddress = _bridgeContract;
         s_ServerAddress = _serverAddress;
@@ -235,7 +229,7 @@ contract SlotMachine is ISlotMachine {
         address recoveredAddress = hash.recover(signature);
 
         // All the Checks before Interaction
-        if (chainId != s_ChainId) {
+        if (chainId != s_DestinationDomain) {
             revert SlotMachine__InvalidChainId();
         }
 

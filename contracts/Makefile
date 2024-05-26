@@ -30,17 +30,6 @@ anvil :; anvil -m 'test test test test test test test test test test test junk' 
 NETWORK_ARGS := --rpc-url http://localhost:8545 --private-key $(DEFAULT_ANVIL_KEY) --broadcast
 
 
-# if --network fantom is used then use fantom network config 
-ifeq ($(findstring --network redStone,$(ARGS)),--network redStone)
-	NETWORK_ARGS := --rpc-url $(REDSTONE_RPC_URL) --private-key $(PRIVATE_KEY_BRIDGE_CONTRACT_DEPLOYMENT) --slow --broadcast -vvvv
-endif
+deploy :
+	forge script script/DeployProtocol.s.sol:DeployProtocol -vvvv
 
-ifeq ($(findstring --network inco,$(ARGS)),--network inco)
-	NETWORK_ARGS := --rpc-url $(INCO_RPC_URL) --private-key $(PRIVATE_KEY_SLOTMACHINE_CONTRACT_DEPLOYMENT) --slow  --broadcast -vvvv
-endif
-
-deploy slotMachine:
-	forge script script/DeploySlotMachine.s.sol:DeploySlotMachine $(NETWORK_ARGS)
-
-deploy rng:
-	forge script script/DeployRandomNumberGenerator.s.sol:DeployRandomNumberGenerator $(NETWORK_ARGS)
