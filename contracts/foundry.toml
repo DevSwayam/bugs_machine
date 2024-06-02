@@ -1,0 +1,17 @@
+[profile.default]
+src = "src"
+out = "out"
+libs = ["lib"]
+solc = "0.8.21"
+
+remappings = [
+    "@openzeppelin/contracts=lib/openzeppelin-contracts/contracts",
+    "@fhevm=lib/fhevm",
+    "@forge-std=lib/forge-std"
+]
+
+[rpc_endpoints]
+inco_network = "${INCO_RPC_URL}"
+redstone_network = "${REDSTONE_RPC_URL}" 
+
+# See more config options https://github.com/foundry-rs/foundry/blob/master/crates/config/README.md#all-options
