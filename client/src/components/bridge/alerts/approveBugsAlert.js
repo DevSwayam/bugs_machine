@@ -24,7 +24,8 @@ const ApproveBugs = ({
   approveBugs,
   w0,
   bugsBalance,
-  bugsApprovalAmount
+  bugsApprovalAmount,
+  setBugsApprovalAmount
 }) => {
   return (
     <AlertDialog>
@@ -94,7 +95,8 @@ const ApproveBugs = ({
                 depositAmount,
                 setIsApprove,
                 setWaitingForApproval,
-                setReloadPage
+                setReloadPage,
+                setBugsApprovalAmount
               );
             }}>
             Approve Bugs

@@ -128,6 +128,7 @@ export function BridgeAccordian({ w0 }) {
           waitingForApproval={waitingForApproval}
           bugsBalance={bugBalance}
           bugsApprovalAmount={bugsApprovalAmount}
+          setBugsApprovalAmount={setBugsApprovalAmount}
         />
 
         <DepositBugAlert

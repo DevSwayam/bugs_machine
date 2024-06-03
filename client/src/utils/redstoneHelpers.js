@@ -17,7 +17,8 @@ export const approveBugs = async (
   depositAmmount,
   setIsApprove,
   setWaitingForApproval,
-  setReloadPage
+  setReloadPage,
+  setBugsApprovalAmount
 ) => {
   setWaitingForApproval(true);
   const provider = await w0?.getEthersProvider();
@@ -48,6 +49,7 @@ export const approveBugs = async (
       console.log(`Owner: ${owner}`);
       console.log(`Spender: ${spender}`);
       console.log(`Value: ${ethers.utils.formatUnits(value, 18)} tokens`);
+      setBugsApprovalAmount(ethers.utils.formatUnits(value, 18))
     });
 
     console.log("Event listener set up and running...");
