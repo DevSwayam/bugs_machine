@@ -444,6 +444,14 @@ contract BugsBridge is ReentrancyGuard, Ownable, Initializable {
     }
 
     /**
+     * @notice Gets the amount of locked BUGS tokens for a user
+     * @return Working status of slot machine
+     */
+    function getSlotMachineStatus() external view returns(bool){
+        return s_IsSlotMachineWorking;
+    }
+
+    /**
      * @notice Converts an address to a bytes32 type, preserving alignment
      * @param _addr The address to be converted
      * @return The bytes32 representation of the address

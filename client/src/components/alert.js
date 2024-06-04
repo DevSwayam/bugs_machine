@@ -52,7 +52,7 @@ const SpringModal = ({ isOpen, setIsOpen, isWinner, jackpot }) => {
                 </h3>
               ) : (
                 <h3 className="text-2xl font-bold text-center mb-2">
-                  You&apos;ve won {jackpot.slice(0, -18)} Bugs
+                  You are a winner
                 </h3>
               )}
 
