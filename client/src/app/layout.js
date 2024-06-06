@@ -6,7 +6,7 @@ import { Toaster } from "@/components/ui/sonner";
 
 import backgroundImg from "@/assets/background.png";
 import CustomPrivyProvider from "@/privy/privyProvider";
-import AudioComponent from "@/components/audio/audioComponent";
+import Image from "next/image";
 
 const sixtyfour = Sixtyfour({ subsets: ["latin"], display: "swap" });
 
@@ -22,11 +22,21 @@ export default function RootLayout({ children }) {
         <CustomPrivyProvider>
           <ThemeProvider attribute="class" defaultTheme="dark">
             <Toaster />
-            <AudioComponent backgroundImg={backgroundImg}>{children}</AudioComponent>
+            <div className="min-h-screen bg-black relative w-full overflow-hidden flex flex-col items-center justify-center">
+              <Image
+                alt="background-image"
+                src={backgroundImg}
+                layout="fill"
+                objectFit="cover"
+                className="absolute inset-0 bottom-0"
+              />
+              <div className="z-50 md:p-0 px-6 w-screen grid items-center justify-center gap-4 h-[100vh] relative">
+                <div>{children}</div>
+              </div>
+            </div>
           </ThemeProvider>
         </CustomPrivyProvider>
       </body>
-
     </html>
   );
 }

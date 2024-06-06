@@ -1,7 +1,7 @@
 import { chainsName, switchToIncoNetwork } from "@/utils/chains";
 import { usePrivy, useWallets } from "@privy-io/react-auth";
 import { useRouter } from "next/navigation";
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import SlotMachine from "./slotmachine";
 import { play, stopSpining, win } from "@/utils/gameFunctions";
 import { toast } from "sonner";
@@ -38,6 +38,30 @@ const Index = () => {
   const [popup, setPopup] = useState(false);
   const [isWinner, setisWinner] = useState(false);
   const [noBalancePopUp, setIsNoBalancePopUp] = useState(false);
+  const backgroundMusicRef = useRef(null);
+  const [isMuted, setIsMuted] = useState(true);
+
+  useEffect(() => {
+    const audioElement = backgroundMusicRef.current;
+
+    const playAudio = async () => {
+      try {
+        await audioElement.play();
+      } catch (error) {
+        console.error("Error playing background music:", error);
+      }
+    };
+
+    if (!isMuted) {
+      playAudio();
+    }
+  }, [isMuted]);
+
+  useEffect(() => {}, []);
+
+  // const toggleMute = () => {
+  //   setIsMuted(!isMuted);
+  // };
 
   const handlePlay = () => {
     play(
@@ -52,11 +76,13 @@ const Index = () => {
       w0,
       setisWinner,
       setValue,
-      setPopup
+      setPopup,
+      setIsMuted
     );
   };
 
   useEffect(() => {
+    setIsMuted(!start);
     if (start) {
       toast(
         "Bet can take some time to get result till then please wait paitently.."
@@ -81,8 +107,8 @@ const Index = () => {
 
   useEffect(() => {
     if (ready && authenticated && w0?.address !== undefined) {
-      if ( ready) {
-        checkUserBalance(w0, setUserBalance, setStart,setIsNoBalancePopUp);
+      if (ready) {
+        checkUserBalance(w0, setUserBalance, setStart, setIsNoBalancePopUp);
         checkSlotMachineBalance(w0, setJackpot, setStart);
         checkBettingAmmount(w0, setBettingAmount, setStart);
       }
@@ -100,19 +126,24 @@ const Index = () => {
   if (ready && authenticated)
     return (
       <div className="min-h-screen flex flex-col items-center justify-center">
-        
+        <audio
+          ref={backgroundMusicRef}
+          src="/spinning_sound.mp3"
+          autoPlay={false}
+          muted={isMuted}
+          loop
+        />
+
         <AlertModal
           isOpen={popup}
           setIsOpen={setPopup}
           isWinner={isWinner}
           jackpot={jackpot}
         />
-        { noBalancePopUp && 
-          <AlertDialogComponent 
-          noPopUpBalance={noBalancePopUp}
-        />
-        }
-        
+        {noBalancePopUp && (
+          <AlertDialogComponent noPopUpBalance={noBalancePopUp} />
+        )}
+
         <div className="w-full">
           <Navbar />
         </div>
@@ -120,13 +151,12 @@ const Index = () => {
         <div className="grid grid-cols-2 grid-rows-9 h-screen w-full md:max-w-[400px] px-4 md:px-0 mt-16">
           <div className="col-span-2 row-span-1">
             <div className="w-full flex gap-2 flex-col justify-between items-center text-[#BCD0FC]">
-              {
-                jackpot !== "0" &&
-                  <AlertDialogComp
+              {jackpot !== "0" && (
+                <AlertDialogComp
                   bettingAmount={bettingAmount}
                   jackpot={jackpot}
                 />
-              }
+              )}
 
               <div className="w-full flex">
                 <div className="flex justify-between w-full">

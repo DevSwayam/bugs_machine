@@ -98,7 +98,7 @@ export const play = async (
   w0,
   setisWinner,
   setValue,
-  setPopup
+  setPopup,
 ) => {
   setStart(true);
   signMessage(w0, setStart, setSpin, setisWinner, setValue, setPopup);
