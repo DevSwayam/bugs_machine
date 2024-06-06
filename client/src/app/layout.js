@@ -4,7 +4,7 @@ import "@rainbow-me/rainbowkit/styles.css";
 import { ThemeProvider } from "@/theme/themeProvider";
 import { Toaster } from "@/components/ui/sonner";
 import Image from "next/image";
-import backgroundImg from "@/assets/incoBg.jpg";
+import backgroundImg from "@/assets/background.png";
 import CustomPrivyProvider from "@/privy/privyProvider";
 
 const sixtyfour = Sixtyfour({ subsets: ["latin"], display: "swap" });

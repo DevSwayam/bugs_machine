@@ -51,6 +51,18 @@ const withdrawLoadingStates = [
   },
 ];
 
+const approveLoadingStates = [
+  {
+    text: "Fetching the user's Bugs balance...",
+  },
+  {
+    text: "Processing contract approval...",
+  },
+  {
+    text: "Tokens approved successfully!",
+  },
+];
+
 export function BridgeAccordian({ w0 }) {
   const { ready, authenticated } = usePrivy();
   const [isApprove, setIsApprove] = useState(false);
@@ -63,10 +75,12 @@ export function BridgeAccordian({ w0 }) {
   const [currentState, setCurrentState] = useState(0);
   const [loading, setLoading] = useState(false);
   const [withdrawLoading, setWithdrawLoading] = useState(false);
-  const [withdrawCurrentState, setWithdrawCurrentState] = useState(false);
+  const [withdrawCurrentState, setWithdrawCurrentState] = useState(0);
   const [bugsApprovalAmount, setBugsApprovalAmount] = useState("0");
   const [actualBugBalance, setActualBugBalance] = useState("0");
   const [realoadPage, setReloadPage] = useState(0);
+  const [approveLoading, setApproveLoading] = useState(false);
+  const [approveCurrentStates, setApproveCurrentStates] = useState(0);
 
   useEffect(() => {
     if (ready && authenticated && w0?.address !== undefined) {
@@ -101,6 +115,13 @@ export function BridgeAccordian({ w0 }) {
         currentState={withdrawCurrentState}
       />
 
+      <MultiStepLoader
+        loadingStates={approveLoadingStates}
+        loading={approveLoading}
+        setLoading={setApproveLoading}
+        currentState={approveCurrentStates}
+      />
+
       <div className="flex gap-4 items-center justify-center">
         <div className="w-20 h-20 rounded-full bg-blue-500 my-4 overflow-hidden border border-green-500">
           <img src="/profile.png" />
@@ -129,6 +150,10 @@ export function BridgeAccordian({ w0 }) {
           bugsBalance={bugBalance}
           bugsApprovalAmount={bugsApprovalAmount}
           setBugsApprovalAmount={setBugsApprovalAmount}
+          setApproveCurrentStates={setApproveCurrentStates}
+          approveCurrentStates={approveCurrentStates}
+          setLoading={setApproveLoading}
+          loading={approveLoading}
         />
 
         <DepositBugAlert

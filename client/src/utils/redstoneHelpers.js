@@ -18,9 +18,14 @@ export const approveBugs = async (
   setIsApprove,
   setWaitingForApproval,
   setReloadPage,
-  setBugsApprovalAmount
+  setBugsApprovalAmount,
+  setApproveCurrentStates,
+  approveCurrentStates,
+  setLoading,
+  loading,
 ) => {
   setWaitingForApproval(true);
+  setApproveCurrentStates((prev) => -1);
   const provider = await w0?.getEthersProvider();
   const signer = await provider?.getSigner();
 
@@ -34,29 +39,30 @@ export const approveBugs = async (
       price
     );
     if (receipt?.from === w0.address) {
-      toast.success("Token Approved successfully!");
+      setLoading(true);
+      setApproveCurrentStates(0);
     }
     let count = 0;
     bugsContract.on("Approval", (owner, spender, value) => {
       count++;
       if (count === 1) {
+        setApproveCurrentStates(1);
         setIsApprove(true);
         setWaitingForApproval(false);
         const randomNumber = Math.floor(Math.random * 10000);
+        setApproveCurrentStates(2);
         setReloadPage(randomNumber);
       }
-      console.log("Approval event detected:");
-      console.log(`Owner: ${owner}`);
-      console.log(`Spender: ${spender}`);
-      console.log(`Value: ${ethers.utils.formatUnits(value, 18)} tokens`);
-      setBugsApprovalAmount(ethers.utils.formatUnits(value, 18))
+      setTimeout(() => {
+        setLoading(false);
+      }, 1500);
     });
-
+    toast.success("Token Approved successfully!");
     console.log("Event listener set up and running...");
   } catch (error) {
     toast("Error Occured!");
     setWaitingForApproval(false);
-    // setSpin(false);
+    setLoading(false);
   }
 };
 

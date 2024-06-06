@@ -25,7 +25,11 @@ const ApproveBugs = ({
   w0,
   bugsBalance,
   bugsApprovalAmount,
-  setBugsApprovalAmount
+  setBugsApprovalAmount,
+  setApproveCurrentStates,
+  approveCurrentStates,
+  setLoading,
+  loading,
 }) => {
   return (
     <AlertDialog>
@@ -84,9 +88,8 @@ const ApproveBugs = ({
         <AlertDialogFooter>
           <AlertDialogCancel>Cancel</AlertDialogCancel>
           <AlertDialogAction
-            className={`${
-              waitingForApproval ? "cursor-not-allowed opacity-50" : ""
-            }`}
+            className={`${waitingForApproval ? "cursor-not-allowed opacity-50" : ""
+              }`}
             // onClick={() => mintBugs(w0)}
             onClick={(e) => {
               // e.preventDefault();
@@ -96,7 +99,11 @@ const ApproveBugs = ({
                 setIsApprove,
                 setWaitingForApproval,
                 setReloadPage,
-                setBugsApprovalAmount
+                setBugsApprovalAmount,
+                setApproveCurrentStates,
+                approveCurrentStates,
+                setLoading,
+                loading,
               );
             }}>
             Approve Bugs
