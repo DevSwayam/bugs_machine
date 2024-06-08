@@ -37,9 +37,6 @@ const Rules = ({ isInstructionOpen, setIsInstructionOpen }) => {
                 <p className='text-white font-semibold'>How to Deposit?</p>
                 <ul className='list-disc pl-4 pt-2'>
                   <li>
-                    <span className='text-[#3FF480]'>Step 1</span> = Click "Approve Bugs" to authorize tokens.
-                  </li>
-                  <li>
                     <span className='text-[#3FF480]'>Step 2</span> = Click "Deposit Bugs" to add tokens.
                   </li>
                 </ul>
