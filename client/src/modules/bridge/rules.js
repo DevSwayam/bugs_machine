@@ -37,13 +37,10 @@ const Rules = ({ isInstructionOpen, setIsInstructionOpen }) => {
                 <p className='text-white font-semibold'>How to Deposit?</p>
                 <ul className='list-disc pl-4 pt-2'>
                   <li>
-                    <span className='text-[#3FF480]'>Step 1</span> = Click "Mint Free Bugs" to get test bugs.
+                    <span className='text-[#3FF480]'>Step 1</span> = Click "Approve Bugs" to authorize tokens.
                   </li>
                   <li>
-                    <span className='text-[#3FF480]'>Step 2</span> = Click "Approve Bugs" to authorize tokens.
-                  </li>
-                  <li>
-                    <span className='text-[#3FF480]'>Step 3</span> = Click "Deposit Bugs" to add tokens.
+                    <span className='text-[#3FF480]'>Step 2</span> = Click "Deposit Bugs" to add tokens.
                   </li>
                 </ul>
               </div>
@@ -51,7 +48,7 @@ const Rules = ({ isInstructionOpen, setIsInstructionOpen }) => {
                 <p className='text-white font-semibold'>How to withdraw?</p>
                 <ul className='list-disc pl-4 pt-2'>
                   <li>
-                    <span className='text-[#3FF480]'>Withdraw Bugs</span> = Click "Withdraw Bugs" to remove tokens.
+                    <span className='text-[#3FF480]'>Withdraw Bugs</span> = Click "Withdraw Bugs" to withdraw tokens.
                   </li>
                 </ul>
               </div>

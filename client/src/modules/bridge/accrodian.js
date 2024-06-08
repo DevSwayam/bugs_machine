@@ -135,9 +135,7 @@ export function BridgeAccordian({ w0 }) {
       </div>
 
       <div className="grid grid-cols-2 gap-4 mt-4">
-        <Mintbugs mintBugs={mintBugs} w0={w0} setReloadPage={setReloadPage} />
-        <p className="text-blue-500 mt-3">Step 1: Mint Free Bugs</p>
-        <p className="text-blue-500 mt-5">Step 2: Approve Bugs</p>
+        <p className="text-blue-500 mt-5">Step 1: Approve Bugs</p>
         <ApproveBugs
           setReloadPage={setReloadPage}
           approveBugs={approveBugs}
@@ -169,7 +167,7 @@ export function BridgeAccordian({ w0 }) {
           bugsApprovalAmount={bugsApprovalAmount}
           setReloadPage={setReloadPage}
         />
-        <p className="text-blue-500 mt-5">Step 3: Deposit Bugs</p>
+        <p className="text-blue-500 mt-5">Step 2: Deposit Bugs</p>
         {/*<ForceWithdrawalAlert forceWithdrawBugs={forceWithdrawBugs} w0={w0} />*/}
       </div>
       <div className="mt-5">
