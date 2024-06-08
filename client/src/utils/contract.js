@@ -9,10 +9,10 @@ export const bugsBridgeABI = bugsBridgeABIJSON;
 export const mailBoxABI = mailBoxABIJSON;
 
 export const slotMachineContractAddress =
-  "0xfd6619C785200e1e83CA320E3d4a56E726c81dC4";
-export const bugsContractAddress = "0xDdfc81D3b8Af938821e4E92C4e91896b37162511";
+  "0x8647fE480Cca90A7D8aa0d81971E40cDF3f660D4";
+export const bugsContractAddress = "0x9c0153C56b460656DF4533246302d42Bd2b49947";
 export const bugsBridgeContractAddress =
-  "0x397c2554eABC3dCc705eC2abD874753d090e6D52";
-export const incoMailboxAddress = "0xe50edeed05b3477aefa072e83269babe5e66dcad";
+  "0x84feCBE520b0A61395a34Ff544455d8981050583";
+export const incoMailboxAddress = "0xe2804640ADaA84F43aDc516870dabDCd2b2cB8B1";
 export const redStoneMailboxAddress =
-  "0xc10f214575d2F7589dC60b2281b66D3C267daA48";
+  "0x6934efa67Bd4C4B9d490b93ACBDb89B3E9C40a40";

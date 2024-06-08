@@ -124,7 +124,7 @@ export const signMessage = async (
   const value = {
     user: address,
     expiration: expirationTime,
-    chainId: 17069, // Redstone chain ID
+    chainId: 690, // Redstone chain ID
     executionChainId: 9090, // Inco chain ID
   };
 

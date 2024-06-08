@@ -19,7 +19,7 @@ const Bridge = () => {
 
   useEffect(() => {
     if (ready && authenticated && w0?.address !== undefined) {
-      if (w0.chainId === "eip155:17069" && ready) {
+      if (w0.chainId === "eip155:690" && ready) {
         setNetworkName(chainsName.redStone);
       }
     }

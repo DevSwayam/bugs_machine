@@ -3,7 +3,7 @@ import { toast } from "sonner";
 export const chainsName = { redStone: "RedStone", inco: "Inco" };
 
 export const redStone = {
-  id: 17069,
+  id: 690,
   network: "Red Stone Network",
   name: "ETH",
   nativeCurrency: {
@@ -84,7 +84,7 @@ export async function switchToRedStoneNetwork(w0, setter) {
     const provider = await w0?.getEthersProvider();
     const res = await provider?.send("wallet_addEthereumChain", [
       {
-        chainId: "0x42AD",
+        chainId: "0x2B2",
         chainName: "Red Stone Network",
         nativeCurrency: {
           name: "RED",
@@ -97,7 +97,7 @@ export async function switchToRedStoneNetwork(w0, setter) {
     ]);
 
     const network = await provider.detectNetwork();
-    if (network.chainId === 17069) {
+    if (network.chainId === 690) {
       setter(chainsName.redStone);
     }
   } catch (error) {
