@@ -32,10 +32,18 @@ const Hero = () => {
                 <span className="text-blue-500">Battle</span>
                 {/* <br className="hidden sm:inline" /> */}
               </h1>
-              <p className="max-w-[700px] text-lg text-muted-foreground text-center">
-                Tired of being BUGS poor? Try your luck with the Bugs Slot
-                Machine! Disclaimer: the Machine is NOT audited, secure and
-                might be a bit buggy itself. Play if you dare! 🐞🎰
+              <p className="max-w-[700px] text-sm text-muted-foreground text-center">
+              Exhausted by the perennial quandary of financial insufficiency? Embark on a speculative venture with the Bugs Slot Machine that utilizes utilizes <a
+                target="_blank"
+                href="https://www.inco.org/"
+                className="underline text-blue-500 cursor-pointer hover:text-blue-600">
+                inco.org
+              </a> as the confidentiality layer for the random number! It behooves us to declare that the Machine remains bereft of official audits as Inco is in Testnet 1 Alpha, its security remains dubious, and its operational integrity may suffer from inherent flaws. Should you choose to engage in this endeavor, proceed with judicious caution. We value your feedback! Reach out here:<a
+                target="_blank"
+                href="https://forms.gle/XAcerorwBgWZzxRJ8"
+                className="underline text-blue-500 cursor-pointer hover:text-blue-600">
+                Form
+              </a>
               </p>
               <div className="flex justify-center items-center gap-3">
                 {authenticated ? (
@@ -59,7 +67,7 @@ const Hero = () => {
                 target="_blank"
                 href="https://0xswayam.gitbook.io/bus"
                 className="underline text-blue-500 cursor-pointer hover:text-blue-600">
-                Instructions
+                Game Information
               </a>
             </div>
           </div>
