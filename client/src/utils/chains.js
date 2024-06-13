@@ -13,10 +13,10 @@ export const redStone = {
   },
   rpcUrls: {
     default: {
-      http: ["https://rpc.garnetchain.com/"],
+      http: ["https://rpc.redstonechain.com/"],
     },
     public: {
-      http: ["https://rpc.garnetchain.com/"],
+      http: ["https://rpc.redstonechain.com/"],
     },
   },
   blockExplorers: {
@@ -91,7 +91,7 @@ export async function switchToRedStoneNetwork(w0, setter) {
           symbol: "ETH",
           decimals: 18,
         },
-        rpcUrls: ["https://rpc.garnetchain.com/"],
+        rpcUrls: ["https://rpc.redstonechain.com/"],
         blockExplorerUrls: ["https://explorer.garnetchain.com/"],
       },
     ]);
