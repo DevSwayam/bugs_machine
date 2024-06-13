@@ -38,7 +38,7 @@ const Hero = () => {
                 href="https://www.inco.org/"
                 className="underline text-blue-500 cursor-pointer hover:text-blue-600">
                 inco.org
-              </a> as the confidentiality layer for the random number! It behooves us to declare that the Machine remains bereft of official audits as Inco is in Testnet 1 Alpha, its security remains dubious, and its operational integrity may suffer from inherent flaws. Should you choose to engage in this endeavor, proceed with judicious caution. We value your feedback! Reach out here:<a
+              </a> as the confidentiality layer for the random number! It behoves us to declare that the machine remains bereft of official audits as Inco is in Testnet 1 Alpha, its security remains dubious, and its operational integrity may suffer from inherent flaws. Should you choose to engage in this endeavor, proceed with judicious caution. We value your feedback! Reach out here:<a
                 target="_blank"
                 href="https://forms.gle/XAcerorwBgWZzxRJ8"
                 className="underline text-blue-500 cursor-pointer hover:text-blue-600">
